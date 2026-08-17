@@ -3176,3 +3176,693 @@ if (
   );
 
 }
+
+/* ================================= */
+/* PUSH NOTIFICATIONS */
+/* ================================= */
+
+const PUSH_VAPID_PUBLIC_KEY =
+  "BLL9phLwCKgmV67QlOU-_onvqut6IZWM4lFKQlWZeo4PDPlsKOjRkzJphUVHy4Ef1yIPLfCgknS9qHDviK1XVNU";
+
+
+const notificationToggleBtn =
+  document.getElementById(
+    "notificationToggleBtn"
+  );
+
+
+const testNotificationBtn =
+  document.getElementById(
+    "testNotificationBtn"
+  );
+
+
+const notificationMessage =
+  document.getElementById(
+    "notificationMessage"
+  );
+
+
+function showNotificationMessage(
+  message,
+  isError = false
+) {
+
+  notificationMessage.textContent =
+    message;
+
+
+  notificationMessage.classList.toggle(
+    "error",
+    isError
+  );
+
+}
+
+
+/*
+  Gjør VAPID-nøkkelen om til formatet
+  PushManager trenger.
+*/
+
+function urlBase64ToUint8Array(
+  base64String
+) {
+
+  const padding =
+    "=".repeat(
+      (
+        4 -
+        base64String.length % 4
+      ) % 4
+    );
+
+
+  const base64 =
+    (
+      base64String +
+      padding
+    )
+      .replace(
+        /-/g,
+        "+"
+      )
+      .replace(
+        /_/g,
+        "/"
+      );
+
+
+  const rawData =
+    window.atob(
+      base64
+    );
+
+
+  const outputArray =
+    new Uint8Array(
+      rawData.length
+    );
+
+
+  for (
+    let i = 0;
+    i < rawData.length;
+    i++
+  ) {
+
+    outputArray[i] =
+      rawData.charCodeAt(
+        i
+      );
+
+  }
+
+
+  return outputArray;
+
+}
+
+
+/* ================================= */
+/* PUSH STATUS */
+/* ================================= */
+
+async function refreshPushStatus() {
+
+  if (
+    !notificationToggleBtn ||
+    !testNotificationBtn
+  ) {
+
+    return;
+
+  }
+
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  if (
+    !(
+      "serviceWorker"
+      in navigator
+    ) ||
+    !(
+      "PushManager"
+      in window
+    ) ||
+    !(
+      "Notification"
+      in window
+    )
+  ) {
+
+    notificationToggleBtn.disabled =
+      true;
+
+
+    testNotificationBtn.disabled =
+      true;
+
+
+    showNotificationMessage(
+      "Pushvarsler støttes ikke her. Åpne appen fra Hjem-skjermen på iPhone.",
+      true
+    );
+
+
+    return;
+
+  }
+
+
+  try {
+
+    const registration =
+      await navigator
+        .serviceWorker
+        .ready;
+
+
+    const subscription =
+      await registration
+        .pushManager
+        .getSubscription();
+
+
+    if (subscription) {
+
+      notificationToggleBtn.textContent =
+        "Aktiv";
+
+
+      notificationToggleBtn
+        .classList
+        .add(
+          "active"
+        );
+
+
+      testNotificationBtn.disabled =
+        false;
+
+
+      showNotificationMessage(
+        "Varsler er aktivert 🌿"
+      );
+
+    } else {
+
+      notificationToggleBtn.textContent =
+        "Aktiver";
+
+
+      notificationToggleBtn
+        .classList
+        .remove(
+          "active"
+        );
+
+
+      testNotificationBtn.disabled =
+        true;
+
+
+      showNotificationMessage(
+        ""
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Push status error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ================================= */
+/* ENABLE PUSH */
+/* ================================= */
+
+async function enablePushNotifications() {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  if (
+    !(
+      "Notification"
+      in window
+    ) ||
+    !(
+      "PushManager"
+      in window
+    ) ||
+    !(
+      "serviceWorker"
+      in navigator
+    )
+  ) {
+
+    showNotificationMessage(
+      "Varsler er ikke tilgjengelige på denne enheten.",
+      true
+    );
+
+    return;
+
+  }
+
+
+  notificationToggleBtn.disabled =
+    true;
+
+
+  showNotificationMessage(
+    "Aktiverer..."
+  );
+
+
+  try {
+
+    /*
+      iPhone viser sitt ekte
+      tillatelsesvindu her.
+    */
+
+    const permission =
+      await Notification
+        .requestPermission();
+
+
+    if (
+      permission !==
+      "granted"
+    ) {
+
+      showNotificationMessage(
+        "Du må tillate varsler for Vekt.",
+        true
+      );
+
+
+      notificationToggleBtn.disabled =
+        false;
+
+
+      return;
+
+    }
+
+
+    const registration =
+      await navigator
+        .serviceWorker
+        .ready;
+
+
+    let subscription =
+      await registration
+        .pushManager
+        .getSubscription();
+
+
+    /*
+      Opprett abonnement hvis telefonen
+      ikke allerede har et.
+    */
+
+    if (!subscription) {
+
+      subscription =
+        await registration
+          .pushManager
+          .subscribe({
+
+            userVisibleOnly:
+              true,
+
+            applicationServerKey:
+              urlBase64ToUint8Array(
+                PUSH_VAPID_PUBLIC_KEY
+              )
+
+          });
+
+    }
+
+
+    const json =
+      subscription.toJSON();
+
+
+    if (
+      !json.keys?.p256dh ||
+      !json.keys?.auth
+    ) {
+
+      throw new Error(
+        "Push-abonnement mangler nøkler."
+      );
+
+    }
+
+
+    /*
+      Lagre akkurat denne telefonen
+      på brukerens Supabase-konto.
+    */
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "push_subscriptions"
+        )
+        .upsert(
+          {
+
+            user_id:
+              currentUser.id,
+
+            endpoint:
+              subscription.endpoint,
+
+            p256dh:
+              json.keys.p256dh,
+
+            auth:
+              json.keys.auth
+
+          },
+          {
+
+            onConflict:
+              "user_id,endpoint"
+
+          }
+        );
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    showNotificationMessage(
+      "Varsler er aktivert 🌿"
+    );
+
+
+    await refreshPushStatus();
+
+  } catch (error) {
+
+    console.error(
+      "Enable push error:",
+      error
+    );
+
+
+    showNotificationMessage(
+      "Kunne ikke aktivere varsler.",
+      true
+    );
+
+  }
+
+
+  notificationToggleBtn.disabled =
+    false;
+
+}
+
+
+/* ================================= */
+/* DISABLE PUSH */
+/* ================================= */
+
+async function disablePushNotifications() {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  notificationToggleBtn.disabled =
+    true;
+
+
+  try {
+
+    const registration =
+      await navigator
+        .serviceWorker
+        .ready;
+
+
+    const subscription =
+      await registration
+        .pushManager
+        .getSubscription();
+
+
+    if (subscription) {
+
+      /*
+        Fjern først fra databasen.
+      */
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from(
+            "push_subscriptions"
+          )
+          .delete()
+          .eq(
+            "endpoint",
+            subscription.endpoint
+          );
+
+
+      if (error) {
+
+        throw error;
+
+      }
+
+
+      await subscription
+        .unsubscribe();
+
+    }
+
+
+    showNotificationMessage(
+      "Varsler er slått av."
+    );
+
+
+    await refreshPushStatus();
+
+  } catch (error) {
+
+    console.error(
+      "Disable push error:",
+      error
+    );
+
+
+    showNotificationMessage(
+      "Kunne ikke slå av varsler.",
+      true
+    );
+
+  }
+
+
+  notificationToggleBtn.disabled =
+    false;
+
+}
+
+
+/* ================================= */
+/* TOGGLE */
+/* ================================= */
+
+async function togglePushNotifications() {
+
+  const registration =
+    await navigator
+      .serviceWorker
+      .ready;
+
+
+  const subscription =
+    await registration
+      .pushManager
+      .getSubscription();
+
+
+  if (subscription) {
+
+    await disablePushNotifications();
+
+  } else {
+
+    await enablePushNotifications();
+
+  }
+
+}
+
+
+/* ================================= */
+/* TEST PUSH */
+/* ================================= */
+
+async function sendTestNotification() {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  testNotificationBtn.disabled =
+    true;
+
+
+  testNotificationBtn.textContent =
+    "Sender...";
+
+
+  showNotificationMessage(
+    "Sender testvarsel..."
+  );
+
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .functions
+        .invoke(
+          "send-test-push",
+          {
+            body: {}
+          }
+        );
+
+
+    if (error) {
+
+      throw error;
+
+    }
+
+
+    if (
+      !data ||
+      data.sent < 1
+    ) {
+
+      throw new Error(
+        "Ingen varsler ble sendt."
+      );
+
+    }
+
+
+    showNotificationMessage(
+      "Testvarsel sendt ✓"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Test push error:",
+      error
+    );
+
+
+    showNotificationMessage(
+      "Testvarselet kunne ikke sendes.",
+      true
+    );
+
+  }
+
+
+  testNotificationBtn.textContent =
+    "Send testvarsel";
+
+
+  testNotificationBtn.disabled =
+    false;
+
+}
+
+
+/* ================================= */
+/* PUSH EVENTS */
+/* ================================= */
+
+notificationToggleBtn
+  ?.addEventListener(
+    "click",
+    togglePushNotifications
+  );
+
+
+testNotificationBtn
+  ?.addEventListener(
+    "click",
+    sendTestNotification
+  );
+
+
+/*
+  Oppdater status hver gang
+  Innstillinger åpnes.
+*/
+
+settingsBtn
+  ?.addEventListener(
+    "click",
+    () => {
+
+      setTimeout(
+        refreshPushStatus,
+        50
+      );
+
+    }
+  );

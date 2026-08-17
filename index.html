@@ -8,83 +8,65 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <meta name="theme-color" content="#b7d8d0">
+  <meta
+    name="theme-color"
+    content="#b7d8d0"
+  >
 
   <title>Min Reise</title>
 
   <link
-  rel="manifest"
-  href="./manifest.json"
->
+    rel="manifest"
+    href="./manifest.json"
+  >
 
-<meta
-  name="apple-mobile-web-app-capable"
-  content="yes"
->
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
 
-<meta
-  name="apple-mobile-web-app-status-bar-style"
-  content="default"
->
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
 
-<meta
-  name="apple-mobile-web-app-title"
-  content="Vekt"
->
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Vekt"
+  >
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 </head>
 
 <body>
 
   <main class="app">
 
-    <!-- ================================= -->
     <!-- LOADING -->
-    <!-- ================================= -->
-
     <section id="loadingView" class="loading-view">
-
       <div class="loading-content">
-
-        <div class="loading-leaf">
-          ❧
-        </div>
-
-        <p>
-          Henter reisen din...
-        </p>
-
+        <div class="loading-leaf">❧</div>
+        <p>Henter reisen din...</p>
       </div>
-
     </section>
 
-
-    <!-- ================================= -->
     <!-- LOGIN / OPPRETT KONTO -->
-    <!-- ================================= -->
-
-    <section
-      id="authView"
-      class="auth-view hidden"
-    >
-
+    <section id="authView" class="auth-view hidden">
       <div class="auth-content">
 
-        <h1>
-          Velkommen.
-        </h1>
+        <h1>Velkommen.</h1>
 
         <p class="auth-intro">
           Logg inn for å fortsette reisen din.
         </p>
 
-
         <div class="auth-fields">
 
           <label>
             E-post
-
             <input
               id="authEmail"
               type="email"
@@ -93,10 +75,8 @@
             >
           </label>
 
-
           <label>
             Passord
-
             <input
               id="authPassword"
               type="password"
@@ -107,14 +87,12 @@
 
         </div>
 
-
         <button
           id="loginBtn"
           class="primary-button auth-primary"
         >
           Logg inn
         </button>
-
 
         <button
           id="signupBtn"
@@ -123,26 +101,16 @@
           Opprett bruker
         </button>
 
-
         <p
           id="authMessage"
           class="auth-message"
         ></p>
 
       </div>
-
     </section>
 
-
-    <!-- ================================= -->
     <!-- DAGENS INNVEIING -->
-    <!-- ================================= -->
-
-    <section
-      id="weighInView"
-      class="weigh-in-view hidden"
-    >
-
+    <section id="weighInView" class="weigh-in-view hidden">
       <div class="weigh-in-content">
 
         <p
@@ -151,7 +119,6 @@
         >
           I dag
         </p>
-
 
         <h1 id="weighInTitle">
           God morgen.
@@ -164,9 +131,7 @@
           Hva veier du i dag?
         </p>
 
-
         <div class="minimal-weight-input">
-
           <input
             id="weightInput"
             type="number"
@@ -174,11 +139,8 @@
             inputmode="decimal"
             placeholder="98,4"
           >
-
           <span>kg</span>
-
         </div>
-
 
         <button
           id="saveWeightBtn"
@@ -186,7 +148,6 @@
         >
           Registrer
         </button>
-
 
         <button
           id="cancelEditBtn"
@@ -196,32 +157,20 @@
         </button>
 
       </div>
-
     </section>
 
-
-    <!-- ================================= -->
     <!-- DASHBOARD -->
-    <!-- ================================= -->
-
-    <section
-      id="dashboardView"
-      class="dashboard-view hidden"
-    >
+    <section id="dashboardView" class="dashboard-view hidden">
 
       <header class="dashboard-header">
 
         <div>
-
           <div class="day-label">
             DAG <span id="dayNumber">01</span>
           </div>
-
         </div>
 
-
         <div class="header-right">
-
           <span class="registered-dot"></span>
 
           <span class="registered-text">
@@ -234,31 +183,18 @@
           >
             Endre
           </button>
-
         </div>
 
       </header>
-
-
-      <!-- HOVEDVEKT -->
 
       <section class="weight-hero">
 
         <div class="weight-glow"></div>
 
-
         <div class="current-weight">
-
-          <span id="currentWeight">
-            --
-          </span>
-
-          <small>
-            kg
-          </small>
-
+          <span id="currentWeight">--</span>
+          <small>kg</small>
         </div>
-
 
         <p
           id="heroChange"
@@ -269,67 +205,32 @@
 
       </section>
 
-
-      <!-- STATS -->
-
       <section class="quick-stats">
 
         <div class="quick-stat">
-
-          <span>
-            7-dagers snitt
-          </span>
-
-          <strong id="averageWeight">
-            --
-          </strong>
-
+          <span>7-dagers snitt</span>
+          <strong id="averageWeight">--</strong>
         </div>
-
 
         <div class="stat-divider"></div>
 
-
         <div class="quick-stat">
-
-          <span>
-            Laveste
-          </span>
-
-          <strong id="lowestWeight">
-            --
-          </strong>
-
+          <span>Laveste</span>
+          <strong id="lowestWeight">--</strong>
         </div>
-
 
         <div class="stat-divider"></div>
 
-
         <div class="quick-stat">
-
-          <span>
-            Streak
-          </span>
+          <span>Streak</span>
 
           <strong class="streak-row">
-
-            <span class="flame">
-              🔥
-            </span>
-
-            <span id="streakStat">
-              --
-            </span>
-
+            <span class="flame">🔥</span>
+            <span id="streakStat">--</span>
           </strong>
-
         </div>
 
       </section>
-
-
-      <!-- MÅL -->
 
       <section class="goal-section">
 
@@ -337,9 +238,7 @@
           MÅLET DITT
         </div>
 
-
         <div class="goal-heading">
-
           <h2 id="goalHeadline">
             Sett et mål
           </h2>
@@ -347,22 +246,16 @@
           <strong id="progressPercent">
             --
           </strong>
-
         </div>
 
-
         <div class="progress-track">
-
           <div
             id="progressFill"
             class="progress-fill"
           ></div>
-
         </div>
 
-
         <div class="goal-numbers">
-
           <span id="startWeightText">
             Start --
           </span>
@@ -374,20 +267,14 @@
           <span id="goalWeightText">
             Mål --
           </span>
-
         </div>
 
       </section>
 
-
-      <!-- GRAF -->
-
       <section class="chart-section">
 
         <div class="chart-heading">
-
           <div>
-
             <div class="section-kicker">
               UTVIKLING
             </div>
@@ -395,55 +282,30 @@
             <h2>
               Vektutvikling
             </h2>
-
           </div>
-
         </div>
 
-
         <div class="chart-container">
-
           <canvas id="weightChart"></canvas>
-
         </div>
 
       </section>
 
-
-      <!-- NAV -->
-
       <nav class="bottom-nav">
 
         <button id="historyBtn">
-
-          <span class="nav-icon">
-            ↗
-          </span>
-
+          <span class="nav-icon">↗</span>
           Historikk
-
         </button>
-
 
         <button id="insightsBtn">
-
-          <span class="nav-icon">
-            ✦
-          </span>
-
+          <span class="nav-icon">✦</span>
           Insights
-
         </button>
 
-
         <button id="settingsBtn">
-
-          <span class="nav-icon">
-            ⚙
-          </span>
-
+          <span class="nav-icon">⚙</span>
           Innstillinger
-
         </button>
 
       </nav>
@@ -452,22 +314,12 @@
 
   </main>
 
-
-  <!-- ================================= -->
   <!-- HISTORIKK -->
-  <!-- ================================= -->
-
-  <div
-    id="historyModal"
-    class="modal hidden"
-  >
-
+  <div id="historyModal" class="modal hidden">
     <div class="modal-card">
 
       <div class="modal-heading">
-
         <div>
-
           <span class="section-kicker">
             INNVEIINGER
           </span>
@@ -475,9 +327,7 @@
           <h2>
             Historikk
           </h2>
-
         </div>
-
 
         <button
           id="closeHistoryBtn"
@@ -485,9 +335,7 @@
         >
           ×
         </button>
-
       </div>
-
 
       <div
         id="historyList"
@@ -495,25 +343,14 @@
       ></div>
 
     </div>
-
   </div>
 
-
-  <!-- ================================= -->
   <!-- INSIGHTS -->
-  <!-- ================================= -->
-
-  <div
-    id="insightsModal"
-    class="modal hidden"
-  >
-
+  <div id="insightsModal" class="modal hidden">
     <div class="modal-card">
 
       <div class="modal-heading">
-
         <div>
-
           <span class="section-kicker">
             DIN UTVIKLING
           </span>
@@ -521,9 +358,7 @@
           <h2>
             Insights
           </h2>
-
         </div>
-
 
         <button
           id="closeInsightsBtn"
@@ -531,12 +366,9 @@
         >
           ×
         </button>
-
       </div>
 
-
       <div class="insight-feature">
-
         <span>
           Gjennomsnittlig tempo
         </span>
@@ -548,9 +380,7 @@
         <small>
           per uke
         </small>
-
       </div>
-
 
       <div class="insight-grid">
 
@@ -586,9 +416,7 @@
 
       </div>
 
-
       <div class="prediction">
-
         <span class="section-kicker">
           PROGNOSE
         </span>
@@ -596,29 +424,17 @@
         <p id="goalPrediction">
           Flere innveiinger kreves før vi kan lage en prognose.
         </p>
-
       </div>
 
     </div>
-
   </div>
 
-
-  <!-- ================================= -->
   <!-- INNSTILLINGER -->
-  <!-- ================================= -->
-
-  <div
-    id="settingsModal"
-    class="modal hidden"
-  >
-
+  <div id="settingsModal" class="modal hidden">
     <div class="modal-card">
 
       <div class="modal-heading">
-
         <div>
-
           <span class="section-kicker">
             DINE MÅL
           </span>
@@ -626,9 +442,7 @@
           <h2>
             Innstillinger
           </h2>
-
         </div>
-
 
         <button
           id="closeSettingsBtn"
@@ -636,51 +450,33 @@
         >
           ×
         </button>
-
       </div>
 
-
       <label>
-
         Startvekt
 
         <div class="settings-input">
-
           <input
             id="startWeightInput"
             type="number"
             step="0.1"
           >
-
-          <span>
-            kg
-          </span>
-
+          <span>kg</span>
         </div>
-
       </label>
 
-
       <label>
-
         Målvekt
 
         <div class="settings-input">
-
           <input
             id="goalWeightInput"
             type="number"
             step="0.1"
           >
-
-          <span>
-            kg
-          </span>
-
+          <span>kg</span>
         </div>
-
       </label>
-
 
       <button
         id="saveSettingsBtn"
@@ -689,47 +485,50 @@
         Lagre
       </button>
 
-<div class="notification-section">
+      <!-- VARSLER -->
+      <div class="notification-section">
 
-  <span class="section-kicker">
-    VARSLER
-  </span>
+        <span class="section-kicker">
+          VARSLER
+        </span>
 
-  <div class="notification-row">
+        <div class="notification-row">
 
-    <div>
-      <strong>
-        Daglig påminnelse
-      </strong>
+          <div>
+            <strong>
+              Daglig påminnelse
+            </strong>
 
-      <small>
-        Påminn meg om dagens innveiing
-      </small>
-    </div>
+            <small>
+              Påminn meg om dagens innveiing
+            </small>
+          </div>
 
-    <button
-      id="notificationToggleBtn"
-      class="notification-toggle"
-    >
-      Aktiver
-    </button>
+          <button
+            id="notificationToggleBtn"
+            class="notification-toggle"
+          >
+            Aktiver
+          </button>
 
-  </div>
+        </div>
 
-  <button
-    id="testNotificationBtn"
-    class="secondary-button notification-test"
-    disabled
-  >
-    Send testvarsel
-  </button>
+        <button
+          id="testNotificationBtn"
+          class="secondary-button notification-test"
+          disabled
+        >
+          Send testvarsel
+        </button>
 
-  <p
-    id="notificationMessage"
-    class="notification-message"
-  ></p>
+        <p
+          id="notificationMessage"
+          class="notification-message"
+        ></p>
 
-</div>
+      </div>
+
+      <!-- KONTO -->
       <div class="account-section">
 
         <span class="section-kicker">
@@ -753,14 +552,10 @@
       </div>
 
     </div>
-
   </div>
 
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="script.js"></script>
 
 </body>

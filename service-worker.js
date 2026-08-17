@@ -5,7 +5,6 @@ self.addEventListener(
   }
 );
 
-
 self.addEventListener(
   "activate",
   event => {
@@ -15,45 +14,29 @@ self.addEventListener(
   }
 );
 
-
-/*
-  PUSHVARSLER
-
-  Denne delen brukes senere når
-  Supabase sender en push til telefonen.
-*/
-
 self.addEventListener(
   "push",
   event => {
-
     let data = {};
 
     try {
-
       data =
         event.data
           ? event.data.json()
           : {};
-
     } catch {
-
       data = {
         body:
           event.data?.text() ??
           ""
       };
-
     }
-
 
     const title =
       data.title ??
       "Vekt";
 
-
     const options = {
-
       body:
         data.body ??
         "Tid for dagens innveiing 🌿",
@@ -63,9 +46,7 @@ self.addEventListener(
           data.url ??
           self.registration.scope
       }
-
     };
-
 
     event.waitUntil(
       self.registration
@@ -74,30 +55,19 @@ self.addEventListener(
           options
         )
     );
-
   }
 );
-
-
-/*
-  Når brukeren trykker
-  på pushvarselet.
-*/
 
 self.addEventListener(
   "notificationclick",
   event => {
-
     event.notification.close();
-
 
     const targetUrl =
       event.notification.data?.url ??
       self.registration.scope;
 
-
     event.waitUntil(
-
       clients
         .matchAll({
           type:
@@ -106,52 +76,36 @@ self.addEventListener(
           includeUncontrolled:
             true
         })
-
         .then(
           async openClients => {
-
             for (
               const client
               of openClients
             ) {
-
               if (
                 "focus" in client
               ) {
-
                 try {
-
                   await client.navigate(
                     targetUrl
                   );
-
                 } catch {
-                  // eksisterende vindu kan
-                  // fortsatt fokuseres
+                  // Kan fortsatt fokusere vinduet.
                 }
 
-
                 return client.focus();
-
               }
-
             }
-
 
             if (
               clients.openWindow
             ) {
-
               return clients.openWindow(
                 targetUrl
               );
-
             }
-
           }
         )
-
     );
-
   }
 );

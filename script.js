@@ -3135,3 +3135,44 @@ async function init() {
 
 
 init();
+
+/* ================================= */
+/* PWA / SERVICE WORKER */
+/* ================================= */
+
+if (
+  "serviceWorker" in navigator
+) {
+
+  window.addEventListener(
+    "load",
+    async () => {
+
+      try {
+
+        const registration =
+          await navigator
+            .serviceWorker
+            .register(
+              "./service-worker.js"
+            );
+
+
+        console.log(
+          "Service Worker klar:",
+          registration.scope
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Service Worker feil:",
+          error
+        );
+
+      }
+
+    }
+  );
+
+}

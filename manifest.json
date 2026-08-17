@@ -1,0 +1,12 @@
+{
+  "name": "Vekt",
+  "short_name": "Vekt",
+  "description": "Daglig vektregistrering og utvikling",
+  "id": "/Vekt-app/",
+  "start_url": "/Vekt-app/",
+  "scope": "/Vekt-app/",
+  "display": "standalone",
+  "background_color": "#e7ebcf",
+  "theme_color": "#b7d8d0",
+  "orientation": "portrait-primary"
+}

@@ -20,12 +20,115 @@
   <main class="app">
 
     <!-- ================================= -->
+    <!-- LOADING -->
+    <!-- ================================= -->
+
+    <section id="loadingView" class="loading-view">
+
+      <div class="loading-content">
+
+        <div class="loading-leaf">
+          ❧
+        </div>
+
+        <div class="brand-mark">
+          MIN REISE
+        </div>
+
+        <p>
+          Henter reisen din...
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================= -->
+    <!-- LOGIN / OPPRETT KONTO -->
+    <!-- ================================= -->
+
+    <section
+      id="authView"
+      class="auth-view hidden"
+    >
+
+      <div class="auth-content">
+
+        <div class="brand-mark">
+          MIN REISE
+        </div>
+
+        <h1>
+          Velkommen.
+        </h1>
+
+        <p class="auth-intro">
+          Logg inn for å fortsette reisen din.
+        </p>
+
+
+        <div class="auth-fields">
+
+          <label>
+            E-post
+
+            <input
+              id="authEmail"
+              type="email"
+              autocomplete="email"
+              placeholder="navn@epost.no"
+            >
+          </label>
+
+
+          <label>
+            Passord
+
+            <input
+              id="authPassword"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Minst 6 tegn"
+            >
+          </label>
+
+        </div>
+
+
+        <button
+          id="loginBtn"
+          class="primary-button auth-primary"
+        >
+          Logg inn
+        </button>
+
+
+        <button
+          id="signupBtn"
+          class="secondary-button"
+        >
+          Opprett bruker
+        </button>
+
+
+        <p
+          id="authMessage"
+          class="auth-message"
+        ></p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================= -->
     <!-- DAGENS INNVEIING -->
     <!-- ================================= -->
 
     <section
       id="weighInView"
-      class="weigh-in-view"
+      class="weigh-in-view hidden"
     >
 
       <div class="weigh-in-content">
@@ -38,8 +141,9 @@
           id="todayLabel"
           class="date-label"
         >
-          Mandag 17. august
+          I dag
         </p>
+
 
         <h1 id="weighInTitle">
           God morgen.
@@ -97,8 +201,6 @@
       class="dashboard-view hidden"
     >
 
-      <!-- HEADER -->
-
       <header class="dashboard-header">
 
         <div>
@@ -134,13 +236,12 @@
       </header>
 
 
-      <!-- ================================= -->
       <!-- HOVEDVEKT -->
-      <!-- ================================= -->
 
       <section class="weight-hero">
 
         <div class="weight-glow"></div>
+
 
         <div class="current-weight">
 
@@ -165,9 +266,7 @@
       </section>
 
 
-      <!-- ================================= -->
-      <!-- HOVEDTALL -->
-      <!-- ================================= -->
+      <!-- STATS -->
 
       <section class="quick-stats">
 
@@ -226,9 +325,7 @@
       </section>
 
 
-      <!-- ================================= -->
       <!-- MÅL -->
-      <!-- ================================= -->
 
       <section class="goal-section">
 
@@ -279,9 +376,7 @@
       </section>
 
 
-      <!-- ================================= -->
       <!-- GRAF -->
-      <!-- ================================= -->
 
       <section class="chart-section">
 
@@ -311,9 +406,7 @@
       </section>
 
 
-      <!-- ================================= -->
       <!-- NAV -->
-      <!-- ================================= -->
 
       <nav class="bottom-nav">
 
@@ -458,80 +551,33 @@
       <div class="insight-grid">
 
         <div>
-
-          <span>
-            Siste 7 dager
-          </span>
-
-          <strong id="insight7Days">
-            --
-          </strong>
-
+          <span>Siste 7 dager</span>
+          <strong id="insight7Days">--</strong>
         </div>
 
-
         <div>
-
-          <span>
-            Siste 30 dager
-          </span>
-
-          <strong id="insight30Days">
-            --
-          </strong>
-
+          <span>Siste 30 dager</span>
+          <strong id="insight30Days">--</strong>
         </div>
 
-
         <div>
-
-          <span>
-            Laveste vekt
-          </span>
-
-          <strong id="insightLowest">
-            --
-          </strong>
-
+          <span>Laveste vekt</span>
+          <strong id="insightLowest">--</strong>
         </div>
 
-
         <div>
-
-          <span>
-            Lengste streak
-          </span>
-
-          <strong id="insightLongestStreak">
-            --
-          </strong>
-
+          <span>Lengste streak</span>
+          <strong id="insightLongestStreak">--</strong>
         </div>
 
-
         <div>
-
-          <span>
-            Totalt gått ned
-          </span>
-
-          <strong id="insightLost">
-            --
-          </strong>
-
+          <span>Totalt gått ned</span>
+          <strong id="insightLost">--</strong>
         </div>
 
-
         <div>
-
-          <span>
-            Mot målet
-          </span>
-
-          <strong id="insightProgress">
-            --
-          </strong>
-
+          <span>Mot målet</span>
+          <strong id="insightProgress">--</strong>
         </div>
 
       </div>
@@ -574,7 +620,7 @@
           </span>
 
           <h2>
-            Vektmål
+            Innstillinger
           </h2>
 
         </div>
@@ -639,12 +685,35 @@
         Lagre
       </button>
 
+
+      <div class="account-section">
+
+        <span class="section-kicker">
+          KONTO
+        </span>
+
+        <p id="accountEmail" class="account-email">
+          --
+        </p>
+
+        <button
+          id="logoutBtn"
+          class="logout-button"
+        >
+          Logg ut
+        </button>
+
+      </div>
+
     </div>
 
   </div>
 
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="script.js"></script>
 
 </body>

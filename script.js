@@ -1,8 +1,85 @@
+/* =========================================================
+   MIN REISE
+   Supabase + ekte lagring
+========================================================= */
+
+
+/* ================================= */
+/* SUPABASE */
+/* ================================= */
+
+const SUPABASE_URL =
+  "https://urybvlcwjvbtjgchyajp.supabase.co";
+
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_-5dzD_N1UmdVOuqOTkrsnA_pJyw7OxE";
+
+
+const SITE_URL =
+  "https://mariussp415.github.io/Vekt-app/";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    }
+  );
+
+
+/* ================================= */
+/* VIEWS */
+/* ================================= */
+
+const loadingView =
+  document.getElementById("loadingView");
+
+const authView =
+  document.getElementById("authView");
+
 const weighInView =
   document.getElementById("weighInView");
 
 const dashboardView =
   document.getElementById("dashboardView");
+
+
+/* ================================= */
+/* AUTH */
+/* ================================= */
+
+const authEmail =
+  document.getElementById("authEmail");
+
+const authPassword =
+  document.getElementById("authPassword");
+
+const loginBtn =
+  document.getElementById("loginBtn");
+
+const signupBtn =
+  document.getElementById("signupBtn");
+
+const authMessage =
+  document.getElementById("authMessage");
+
+const logoutBtn =
+  document.getElementById("logoutBtn");
+
+const accountEmail =
+  document.getElementById("accountEmail");
+
+
+/* ================================= */
+/* WEIGH IN */
+/* ================================= */
 
 const weightInput =
   document.getElementById("weightInput");
@@ -26,6 +103,10 @@ const todayLabel =
   document.getElementById("todayLabel");
 
 
+/* ================================= */
+/* DASHBOARD */
+/* ================================= */
+
 const currentWeight =
   document.getElementById("currentWeight");
 
@@ -35,7 +116,6 @@ const heroChange =
 const dayNumber =
   document.getElementById("dayNumber");
 
-
 const averageWeight =
   document.getElementById("averageWeight");
 
@@ -44,7 +124,6 @@ const lowestWeight =
 
 const streakStat =
   document.getElementById("streakStat");
-
 
 const progressPercent =
   document.getElementById("progressPercent");
@@ -65,6 +144,10 @@ const goalHeadline =
   document.getElementById("goalHeadline");
 
 
+/* ================================= */
+/* HISTORY */
+/* ================================= */
+
 const historyBtn =
   document.getElementById("historyBtn");
 
@@ -77,6 +160,10 @@ const closeHistoryBtn =
 const historyList =
   document.getElementById("historyList");
 
+
+/* ================================= */
+/* INSIGHTS */
+/* ================================= */
 
 const insightsBtn =
   document.getElementById("insightsBtn");
@@ -100,17 +187,27 @@ const insightLowest =
   document.getElementById("insightLowest");
 
 const insightLongestStreak =
-  document.getElementById("insightLongestStreak");
+  document.getElementById(
+    "insightLongestStreak"
+  );
 
 const insightLost =
   document.getElementById("insightLost");
 
 const insightProgress =
-  document.getElementById("insightProgress");
+  document.getElementById(
+    "insightProgress"
+  );
 
 const goalPrediction =
-  document.getElementById("goalPrediction");
+  document.getElementById(
+    "goalPrediction"
+  );
 
+
+/* ================================= */
+/* SETTINGS */
+/* ================================= */
 
 const settingsBtn =
   document.getElementById("settingsBtn");
@@ -119,29 +216,33 @@ const settingsModal =
   document.getElementById("settingsModal");
 
 const closeSettingsBtn =
-  document.getElementById("closeSettingsBtn");
+  document.getElementById(
+    "closeSettingsBtn"
+  );
 
 const saveSettingsBtn =
-  document.getElementById("saveSettingsBtn");
+  document.getElementById(
+    "saveSettingsBtn"
+  );
 
 const startWeightInput =
-  document.getElementById("startWeightInput");
+  document.getElementById(
+    "startWeightInput"
+  );
 
 const goalWeightInput =
-  document.getElementById("goalWeightInput");
+  document.getElementById(
+    "goalWeightInput"
+  );
 
 
-let weightChart;
+/* ================================= */
+/* STATE */
+/* ================================= */
 
-let editingToday = false;
+let currentUser = null;
 
-
-/*
-  TESTMODUS
-
-  Ingenting lagres permanent ennå.
-  Refresh = helt ny start.
-*/
+let profile = null;
 
 let entries = [];
 
@@ -150,9 +251,15 @@ let settings = {
   goalWeight: null
 };
 
+let weightChart = null;
+
+let editingToday = false;
+
+let lastKnownDate = getToday();
+
 
 /* ================================= */
-/* DATE */
+/* DATO */
 /* ================================= */
 
 function getToday() {
@@ -168,19 +275,21 @@ function getToday() {
   const month =
     String(
       now.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
+    )
+      .padStart(
+        2,
+        "0"
+      );
 
 
   const day =
     String(
       now.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
+    )
+      .padStart(
+        2,
+        "0"
+      );
 
 
   return `${year}-${month}-${day}`;
@@ -274,6 +383,492 @@ function formatChange(value) {
 }
 
 
+/* ================================= */
+/* VIEW HELPERS */
+/* ================================= */
+
+function hideMainViews() {
+
+  loadingView.classList.add(
+    "hidden"
+  );
+
+  authView.classList.add(
+    "hidden"
+  );
+
+  weighInView.classList.add(
+    "hidden"
+  );
+
+  dashboardView.classList.add(
+    "hidden"
+  );
+
+}
+
+
+function showLoading() {
+
+  hideMainViews();
+
+  loadingView.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+function showAuth() {
+
+  hideMainViews();
+
+  authView.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+function closeAllModals() {
+
+  historyModal.classList.add(
+    "hidden"
+  );
+
+  insightsModal.classList.add(
+    "hidden"
+  );
+
+  settingsModal.classList.add(
+    "hidden"
+  );
+
+}
+
+
+/* ================================= */
+/* AUTH MESSAGE */
+/* ================================= */
+
+function showAuthMessage(
+  message,
+  isError = false
+) {
+
+  authMessage.textContent =
+    message;
+
+
+  authMessage.classList.toggle(
+    "error",
+    isError
+  );
+
+}
+
+
+/* ================================= */
+/* LOGIN */
+/* ================================= */
+
+async function login() {
+
+  const email =
+    authEmail.value
+      .trim();
+
+
+  const password =
+    authPassword.value;
+
+
+  if (
+    !email ||
+    !password
+  ) {
+
+    showAuthMessage(
+      "Skriv inn e-post og passord.",
+      true
+    );
+
+    return;
+
+  }
+
+
+  loginBtn.disabled =
+    true;
+
+
+  loginBtn.textContent =
+    "Logger inn...";
+
+
+  showAuthMessage("");
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .auth
+      .signInWithPassword({
+        email,
+        password
+      });
+
+
+  loginBtn.disabled =
+    false;
+
+
+  loginBtn.textContent =
+    "Logg inn";
+
+
+  if (error) {
+
+    showAuthMessage(
+      error.message,
+      true
+    );
+
+    return;
+
+  }
+
+
+  currentUser =
+    data.user;
+
+
+  showLoading();
+
+
+  await loadUserData();
+
+
+  render();
+
+}
+
+
+/* ================================= */
+/* SIGN UP */
+/* ================================= */
+
+async function signup() {
+
+  const email =
+    authEmail.value
+      .trim();
+
+
+  const password =
+    authPassword.value;
+
+
+  if (!email) {
+
+    showAuthMessage(
+      "Skriv inn e-postadressen din.",
+      true
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !password ||
+    password.length < 6
+  ) {
+
+    showAuthMessage(
+      "Passordet må være minst 6 tegn.",
+      true
+    );
+
+    return;
+
+  }
+
+
+  signupBtn.disabled =
+    true;
+
+
+  signupBtn.textContent =
+    "Oppretter...";
+
+
+  showAuthMessage("");
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .auth
+      .signUp({
+
+        email,
+
+        password,
+
+        options: {
+
+          emailRedirectTo:
+            SITE_URL
+
+        }
+
+      });
+
+
+  signupBtn.disabled =
+    false;
+
+
+  signupBtn.textContent =
+    "Opprett bruker";
+
+
+  if (error) {
+
+    showAuthMessage(
+      error.message,
+      true
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Hvis email confirmation er aktivert,
+    får vi normalt ingen session før
+    brukeren har trykket linken i mailen.
+  */
+
+  if (!data.session) {
+
+    showAuthMessage(
+      "Konto opprettet 🌿 Sjekk e-posten din og bekreft adressen."
+    );
+
+    return;
+
+  }
+
+
+  currentUser =
+    data.user;
+
+
+  showLoading();
+
+
+  await loadUserData();
+
+
+  render();
+
+}
+
+
+/* ================================= */
+/* LOGOUT */
+/* ================================= */
+
+async function logout() {
+
+  logoutBtn.disabled =
+    true;
+
+
+  await supabaseClient
+    .auth
+    .signOut();
+
+
+  logoutBtn.disabled =
+    false;
+
+
+  currentUser =
+    null;
+
+
+  profile =
+    null;
+
+
+  entries =
+    [];
+
+
+  settings = {
+    startWeight: null,
+    goalWeight: null
+  };
+
+
+  editingToday =
+    false;
+
+
+  closeAllModals();
+
+
+  authPassword.value =
+    "";
+
+
+  showAuth();
+
+}
+
+
+/* ================================= */
+/* LOAD DATA */
+/* ================================= */
+
+async function loadUserData() {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  const [
+    profileResult,
+    entriesResult
+  ] =
+    await Promise.all([
+
+      supabaseClient
+        .from(
+          "weight_profiles"
+        )
+        .select(
+          "journey_start_date,start_weight,goal_weight"
+        )
+        .maybeSingle(),
+
+
+      supabaseClient
+        .from(
+          "weight_entries"
+        )
+        .select(
+          "id,weighed_on,weight"
+        )
+        .order(
+          "weighed_on",
+          {
+            ascending: true
+          }
+        )
+
+    ]);
+
+
+  if (
+    profileResult.error
+  ) {
+
+    console.error(
+      profileResult.error
+    );
+
+    alert(
+      "Kunne ikke hente profilen din."
+    );
+
+  }
+
+
+  if (
+    entriesResult.error
+  ) {
+
+    console.error(
+      entriesResult.error
+    );
+
+    alert(
+      "Kunne ikke hente innveiingene dine."
+    );
+
+  }
+
+
+  profile =
+    profileResult.data ??
+    null;
+
+
+  entries =
+    (
+      entriesResult.data ??
+      []
+    )
+      .map(
+        entry => ({
+          id:
+            entry.id,
+
+          date:
+            entry.weighed_on,
+
+          weight:
+            Number(
+              entry.weight
+            )
+        })
+      );
+
+
+  settings.startWeight =
+    profile?.start_weight !== null &&
+    profile?.start_weight !== undefined
+
+      ? Number(
+          profile.start_weight
+        )
+
+      : (
+          entries[0]?.weight ??
+          null
+        );
+
+
+  settings.goalWeight =
+    profile?.goal_weight !== null &&
+    profile?.goal_weight !== undefined
+
+      ? Number(
+          profile.goal_weight
+        )
+
+      : null;
+
+}
+
+
+/* ================================= */
+/* TODAY ENTRY */
+/* ================================= */
+
 function getTodayEntry() {
 
   return entries.find(
@@ -286,10 +881,49 @@ function getTodayEntry() {
 
 
 /* ================================= */
+/* DAY NUMBER */
+/* ================================= */
+
+function calculateDayNumber() {
+
+  if (
+    !profile?.journey_start_date
+  ) {
+
+    return 1;
+
+  }
+
+
+  const difference =
+    daysBetween(
+      profile.journey_start_date,
+      getToday()
+    );
+
+
+  return Math.max(
+    1,
+    difference + 1
+  );
+
+}
+
+
+/* ================================= */
 /* VIEW */
 /* ================================= */
 
 function renderView() {
+
+  if (!currentUser) {
+
+    showAuth();
+
+    return;
+
+  }
+
 
   const todayEntry =
     getTodayEntry();
@@ -300,16 +934,12 @@ function renderView() {
     editingToday
   ) {
 
+    hideMainViews();
+
+
     weighInView
       .classList
       .remove(
-        "hidden"
-      );
-
-
-    dashboardView
-      .classList
-      .add(
         "hidden"
       );
 
@@ -373,11 +1003,7 @@ function renderView() {
   }
 
 
-  weighInView
-    .classList
-    .add(
-      "hidden"
-    );
+  hideMainViews();
 
 
   dashboardView
@@ -393,7 +1019,14 @@ function renderView() {
 /* SAVE WEIGHT */
 /* ================================= */
 
-function saveWeight() {
+async function saveWeight() {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
 
   const weight =
     parseFloat(
@@ -406,7 +1039,7 @@ function saveWeight() {
 
 
   if (
-    !weight ||
+    !Number.isFinite(weight) ||
     weight < 30 ||
     weight > 300
   ) {
@@ -420,46 +1053,202 @@ function saveWeight() {
   }
 
 
+  saveWeightBtn.disabled =
+    true;
+
+
+  const originalText =
+    saveWeightBtn.textContent;
+
+
+  saveWeightBtn.textContent =
+    "Lagrer...";
+
+
+  const today =
+    getToday();
+
+
   const existing =
     getTodayEntry();
 
 
-  if (existing) {
+  /*
+    Første innveiing noensinne:
+    dette blir starten på reisen.
+  */
 
-    existing.weight =
-      weight;
+  if (!profile) {
 
-  } else {
+    const {
+      error: profileError
+    } =
+      await supabaseClient
+        .from(
+          "weight_profiles"
+        )
+        .insert({
 
-    entries.push({
-      date:
-        getToday(),
+          user_id:
+            currentUser.id,
 
-      weight
-    });
+          journey_start_date:
+            today,
+
+          start_weight:
+            weight,
+
+          goal_weight:
+            settings.goalWeight
+
+        });
+
+
+    if (profileError) {
+
+      console.error(
+        profileError
+      );
+
+
+      saveWeightBtn.disabled =
+        false;
+
+
+      saveWeightBtn.textContent =
+        originalText;
+
+
+      alert(
+        "Kunne ikke starte reisen din."
+      );
+
+      return;
+
+    }
 
   }
 
 
-  entries.sort(
-    (a, b) =>
-      parseDate(a.date) -
-      parseDate(b.date)
-  );
+  /*
+    Oppdater eller legg til dagens vekt.
+  */
 
+  let saveError;
+
+
+  if (existing) {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "weight_entries"
+        )
+        .update({
+          weight
+        })
+        .eq(
+          "id",
+          existing.id
+        );
+
+
+    saveError =
+      error;
+
+  } else {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from(
+          "weight_entries"
+        )
+        .insert({
+
+          user_id:
+            currentUser.id,
+
+          weighed_on:
+            today,
+
+          weight
+
+        });
+
+
+    saveError =
+      error;
+
+  }
+
+
+  if (saveError) {
+
+    console.error(
+      saveError
+    );
+
+
+    saveWeightBtn.disabled =
+      false;
+
+
+    saveWeightBtn.textContent =
+      originalText;
+
+
+    alert(
+      "Kunne ikke lagre vekten."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Hvis profilen eksisterer,
+    men mangler startvekt.
+  */
 
   if (
+    profile &&
     settings.startWeight === null
   ) {
 
-    settings.startWeight =
-      weight;
+    await supabaseClient
+      .from(
+        "weight_profiles"
+      )
+      .update({
+        start_weight:
+          weight
+      })
+      .eq(
+        "user_id",
+        currentUser.id
+      );
 
   }
 
 
   editingToday =
     false;
+
+
+  await loadUserData();
+
+
+  saveWeightBtn.disabled =
+    false;
+
+
+  saveWeightBtn.textContent =
+    originalText;
 
 
   render();
@@ -480,12 +1269,45 @@ function calculateCurrentStreak() {
   }
 
 
-  let streak = 1;
+  const sorted =
+    [...entries]
+      .sort(
+        (a, b) =>
+          parseDate(a.date) -
+          parseDate(b.date)
+      );
+
+
+  const latest =
+    sorted[
+      sorted.length - 1
+    ];
+
+
+  /*
+    Hvis siste registrering er eldre
+    enn i går, er streaken brutt.
+  */
+
+  if (
+    daysBetween(
+      latest.date,
+      getToday()
+    ) > 1
+  ) {
+
+    return 0;
+
+  }
+
+
+  let streak =
+    1;
 
 
   for (
     let i =
-      entries.length - 1;
+      sorted.length - 1;
 
     i > 0;
 
@@ -494,8 +1316,8 @@ function calculateCurrentStreak() {
 
     if (
       daysBetween(
-        entries[i - 1].date,
-        entries[i].date
+        sorted[i - 1].date,
+        sorted[i].date
       ) === 1
     ) {
 
@@ -524,23 +1346,35 @@ function calculateLongestStreak() {
   }
 
 
-  let longest = 1;
+  const sorted =
+    [...entries]
+      .sort(
+        (a, b) =>
+          parseDate(a.date) -
+          parseDate(b.date)
+      );
 
-  let current = 1;
+
+  let longest =
+    1;
+
+
+  let current =
+    1;
 
 
   for (
     let i = 1;
 
-    i < entries.length;
+    i < sorted.length;
 
     i++
   ) {
 
     if (
       daysBetween(
-        entries[i - 1].date,
-        entries[i].date
+        sorted[i - 1].date,
+        sorted[i].date
       ) === 1
     ) {
 
@@ -555,7 +1389,8 @@ function calculateLongestStreak() {
 
     } else {
 
-      current = 1;
+      current =
+        1;
 
     }
 
@@ -587,13 +1422,16 @@ function calculateStats() {
 
 
   const lastSeven =
-    entries.slice(-7);
+    entries.slice(
+      -7
+    );
 
 
   const average =
     lastSeven.reduce(
       (sum, entry) =>
-        sum + entry.weight,
+        sum +
+        entry.weight,
       0
     ) /
     lastSeven.length;
@@ -622,7 +1460,9 @@ function calculateStats() {
     latest.weight;
 
 
-  let progress = 0;
+  let progress =
+    0;
+
 
   let remainingWeight =
     null;
@@ -712,7 +1552,7 @@ function renderDashboard() {
 
   dayNumber.textContent =
     String(
-      entries.length
+      calculateDayNumber()
     )
       .padStart(
         2,
@@ -740,12 +1580,14 @@ function renderDashboard() {
 
   streakStat.textContent =
     stats.streak === 1
+
       ? "1 dag"
+
       : `${stats.streak} dager`;
 
 
   /*
-    STATUS UNDER WEIGHT
+    Tekst under hovedvekten.
   */
 
   if (
@@ -784,7 +1626,7 @@ function renderDashboard() {
 
 
   /*
-    NO GOAL
+    Ingen målvekt.
   */
 
   if (
@@ -821,10 +1663,6 @@ function renderDashboard() {
 
   }
 
-
-  /*
-    GOAL EXISTS
-  */
 
   const percent =
     Math.round(
@@ -865,7 +1703,7 @@ function renderDashboard() {
 
 
 /* ================================= */
-/* INSIGHTS */
+/* CHANGE OVER DAYS */
 /* ================================= */
 
 function changeOverDays(days) {
@@ -910,7 +1748,7 @@ function changeOverDays(days) {
 
   if (
     !candidate ||
-    candidate === latest
+    candidate.id === latest.id
   ) {
 
     return null;
@@ -925,6 +1763,10 @@ function changeOverDays(days) {
 
 }
 
+
+/* ================================= */
+/* WEEKLY PACE */
+/* ================================= */
 
 function calculateWeeklyPace() {
 
@@ -975,6 +1817,10 @@ function calculateWeeklyPace() {
 }
 
 
+/* ================================= */
+/* INSIGHTS */
+/* ================================= */
+
 function renderInsights() {
 
   const stats =
@@ -994,7 +1840,9 @@ function renderInsights() {
 
   insightPace.textContent =
     pace === null
+
       ? "--"
+
       : `${formatChange(
           pace
         )} / uke`;
@@ -1002,13 +1850,17 @@ function renderInsights() {
 
   insight7Days.textContent =
     formatChange(
-      changeOverDays(7)
+      changeOverDays(
+        7
+      )
     );
 
 
   insight30Days.textContent =
     formatChange(
-      changeOverDays(30)
+      changeOverDays(
+        30
+      )
     );
 
 
@@ -1024,7 +1876,9 @@ function renderInsights() {
 
   insightLongestStreak.textContent =
     longest === 1
+
       ? "🔥 1 dag"
+
       : `🔥 ${longest} dager`;
 
 
@@ -1051,15 +1905,13 @@ function renderInsights() {
 
   insightProgress.textContent =
     stats.goal !== null
+
       ? `${Math.round(
           stats.progress
         )}%`
+
       : "--";
 
-
-  /*
-    GOAL FORECAST
-  */
 
   if (
     stats.goal === null
@@ -1100,7 +1952,9 @@ function renderInsights() {
 
   const weeksRemaining =
     stats.remainingWeight /
-    Math.abs(pace);
+    Math.abs(
+      pace
+    );
 
 
   const prediction =
@@ -1116,7 +1970,7 @@ function renderInsights() {
   );
 
 
-  const text =
+  const predictionText =
     prediction
       .toLocaleDateString(
         "nb-NO",
@@ -1131,7 +1985,7 @@ function renderInsights() {
 
 
   goalPrediction.textContent =
-    `Med dagens tempo er estimert måldato rundt ${text}.`;
+    `Med dagens tempo er estimert måldato rundt ${predictionText}.`;
 
 }
 
@@ -1205,7 +2059,7 @@ function renderHistory() {
 
                 <button
                   class="delete-btn"
-                  onclick="deleteEntry('${entry.date}')"
+                  onclick="deleteEntry('${entry.id}')"
                 >
                   Slett
                 </button>
@@ -1223,25 +2077,57 @@ function renderHistory() {
 }
 
 
-function deleteEntry(date) {
+/* ================================= */
+/* DELETE */
+/* ================================= */
 
-  entries =
-    entries.filter(
-      entry =>
-        entry.date !==
-        date
+async function deleteEntry(id) {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "weight_entries"
+      )
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    console.error(
+      error
     );
+
+
+    alert(
+      "Kunne ikke slette innveiingen."
+    );
+
+    return;
+
+  }
+
+
+  closeAllModals();
 
 
   editingToday =
     false;
 
 
-  historyModal
-    .classList
-    .add(
-      "hidden"
-    );
+  await loadUserData();
 
 
   render();
@@ -1276,15 +2162,10 @@ function renderChart() {
 
   const labels =
     entries.map(
-      entry => {
-
-        const date =
-          parseDate(
-            entry.date
-          );
-
-
-        return date
+      entry =>
+        parseDate(
+          entry.date
+        )
           .toLocaleDateString(
             "nb-NO",
             {
@@ -1294,9 +2175,7 @@ function renderChart() {
               month:
                 "short"
             }
-          );
-
-      }
+          )
     );
 
 
@@ -1309,7 +2188,10 @@ function renderChart() {
 
   const averages =
     entries.map(
-      (entry, index) => {
+      (
+        entry,
+        index
+      ) => {
 
         const recent =
           entries.slice(
@@ -1323,7 +2205,10 @@ function renderChart() {
 
         return (
           recent.reduce(
-            (sum, item) =>
+            (
+              sum,
+              item
+            ) =>
               sum +
               item.weight,
             0
@@ -1356,9 +2241,7 @@ function renderChart() {
   );
 
 
-  if (
-    weightChart
-  ) {
+  if (weightChart) {
 
     weightChart.destroy();
 
@@ -1377,7 +2260,6 @@ function renderChart() {
         data: {
 
           labels,
-
 
           datasets: [
 
@@ -1549,11 +2431,7 @@ function renderChart() {
               ticks: {
 
                 color:
-                  "#788475",
-
-                callback:
-                  value =>
-                    `${value}`
+                  "#788475"
 
               }
 
@@ -1570,6 +2448,159 @@ function renderChart() {
 
 
 /* ================================= */
+/* SAVE SETTINGS */
+/* ================================= */
+
+async function saveSettings() {
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  const start =
+    parseFloat(
+      startWeightInput.value
+    );
+
+
+  const goal =
+    parseFloat(
+      goalWeightInput.value
+    );
+
+
+  const startValue =
+    Number.isFinite(
+      start
+    )
+
+      ? start
+
+      : (
+          settings.startWeight ??
+          entries[0]?.weight ??
+          null
+        );
+
+
+  const goalValue =
+    Number.isFinite(
+      goal
+    )
+
+      ? goal
+
+      : null;
+
+
+  saveSettingsBtn.disabled =
+    true;
+
+
+  saveSettingsBtn.textContent =
+    "Lagrer...";
+
+
+  let error;
+
+
+  if (profile) {
+
+    const result =
+      await supabaseClient
+        .from(
+          "weight_profiles"
+        )
+        .update({
+
+          start_weight:
+            startValue,
+
+          goal_weight:
+            goalValue
+
+        })
+        .eq(
+          "user_id",
+          currentUser.id
+        );
+
+
+    error =
+      result.error;
+
+  } else {
+
+    const result =
+      await supabaseClient
+        .from(
+          "weight_profiles"
+        )
+        .insert({
+
+          user_id:
+            currentUser.id,
+
+          journey_start_date:
+            entries[0]?.date ??
+            getToday(),
+
+          start_weight:
+            startValue,
+
+          goal_weight:
+            goalValue
+
+        });
+
+
+    error =
+      result.error;
+
+  }
+
+
+  saveSettingsBtn.disabled =
+    false;
+
+
+  saveSettingsBtn.textContent =
+    "Lagre";
+
+
+  if (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Kunne ikke lagre innstillingene."
+    );
+
+    return;
+
+  }
+
+
+  settingsModal.classList.add(
+    "hidden"
+  );
+
+
+  await loadUserData();
+
+
+  render();
+
+}
+
+
+/* ================================= */
 /* RENDER */
 /* ================================= */
 
@@ -1578,6 +2609,19 @@ function render() {
   renderDate();
 
   renderView();
+
+
+  if (!currentUser) {
+
+    return;
+
+  }
+
+
+  accountEmail.textContent =
+    currentUser.email ??
+    "";
+
 
   renderDashboard();
 
@@ -1604,302 +2648,490 @@ function render() {
 
 
 /* ================================= */
-/* EVENTS */
+/* NEW DAY CHECK */
 /* ================================= */
 
-saveWeightBtn
-  .addEventListener(
-    "click",
-    saveWeight
-  );
+async function checkForNewDay() {
+
+  const today =
+    getToday();
 
 
-weightInput
-  .addEventListener(
-    "keydown",
-    event => {
+  if (
+    today === lastKnownDate
+  ) {
 
-      if (
-        event.key ===
-        "Enter"
-      ) {
+    return;
 
-        saveWeight();
+  }
 
-      }
+
+  lastKnownDate =
+    today;
+
+
+  editingToday =
+    false;
+
+
+  closeAllModals();
+
+
+  if (!currentUser) {
+
+    renderDate();
+
+    return;
+
+  }
+
+
+  showLoading();
+
+
+  await loadUserData();
+
+
+  render();
+
+}
+
+
+/* ================================= */
+/* AUTH EVENTS */
+/* ================================= */
+
+loginBtn.addEventListener(
+  "click",
+  login
+);
+
+
+signupBtn.addEventListener(
+  "click",
+  signup
+);
+
+
+authPassword.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key ===
+      "Enter"
+    ) {
+
+      login();
 
     }
-  );
+
+  }
+);
 
 
-/* EDIT */
-
-editWeightBtn
-  .addEventListener(
-    "click",
-    () => {
-
-      editingToday =
-        true;
+logoutBtn.addEventListener(
+  "click",
+  logout
+);
 
 
-      render();
+/* ================================= */
+/* WEIGHT EVENTS */
+/* ================================= */
 
+saveWeightBtn.addEventListener(
+  "click",
+  saveWeight
+);
+
+
+weightInput.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key ===
+      "Enter"
+    ) {
+
+      saveWeight();
+
+    }
+
+  }
+);
+
+
+editWeightBtn.addEventListener(
+  "click",
+  () => {
+
+    editingToday =
+      true;
+
+
+    render();
+
+
+    setTimeout(
+      () => {
+
+        weightInput.focus();
+
+        weightInput.select();
+
+      },
+      50
+    );
+
+  }
+);
+
+
+cancelEditBtn.addEventListener(
+  "click",
+  () => {
+
+    editingToday =
+      false;
+
+
+    render();
+
+  }
+);
+
+
+/* ================================= */
+/* HISTORY EVENTS */
+/* ================================= */
+
+historyBtn.addEventListener(
+  "click",
+  () => {
+
+    renderHistory();
+
+
+    historyModal.classList.remove(
+      "hidden"
+    );
+
+  }
+);
+
+
+closeHistoryBtn.addEventListener(
+  "click",
+  () => {
+
+    historyModal.classList.add(
+      "hidden"
+    );
+
+  }
+);
+
+
+historyModal.addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target ===
+      historyModal
+    ) {
+
+      historyModal.classList.add(
+        "hidden"
+      );
+
+    }
+
+  }
+);
+
+
+/* ================================= */
+/* INSIGHTS EVENTS */
+/* ================================= */
+
+insightsBtn.addEventListener(
+  "click",
+  () => {
+
+    renderInsights();
+
+
+    insightsModal.classList.remove(
+      "hidden"
+    );
+
+  }
+);
+
+
+closeInsightsBtn.addEventListener(
+  "click",
+  () => {
+
+    insightsModal.classList.add(
+      "hidden"
+    );
+
+  }
+);
+
+
+insightsModal.addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target ===
+      insightsModal
+    ) {
+
+      insightsModal.classList.add(
+        "hidden"
+      );
+
+    }
+
+  }
+);
+
+
+/* ================================= */
+/* SETTINGS EVENTS */
+/* ================================= */
+
+settingsBtn.addEventListener(
+  "click",
+  () => {
+
+    startWeightInput.value =
+      settings.startWeight ??
+      "";
+
+
+    goalWeightInput.value =
+      settings.goalWeight ??
+      "";
+
+
+    accountEmail.textContent =
+      currentUser?.email ??
+      "";
+
+
+    settingsModal.classList.remove(
+      "hidden"
+    );
+
+  }
+);
+
+
+closeSettingsBtn.addEventListener(
+  "click",
+  () => {
+
+    settingsModal.classList.add(
+      "hidden"
+    );
+
+  }
+);
+
+
+settingsModal.addEventListener(
+  "click",
+  event => {
+
+    if (
+      event.target ===
+      settingsModal
+    ) {
+
+      settingsModal.classList.add(
+        "hidden"
+      );
+
+    }
+
+  }
+);
+
+
+saveSettingsBtn.addEventListener(
+  "click",
+  saveSettings
+);
+
+
+/* ================================= */
+/* MIDNIGHT / RESUME */
+/* ================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+
+    if (
+      document.visibilityState ===
+      "visible"
+    ) {
+
+      checkForNewDay();
+
+    }
+
+  }
+);
+
+
+window.addEventListener(
+  "focus",
+  checkForNewDay
+);
+
+
+/*
+  Hvis appen faktisk står åpen over
+  midnatt, sjekker vi hvert minutt.
+*/
+
+setInterval(
+  checkForNewDay,
+  60000
+);
+
+
+/* ================================= */
+/* AUTH STATE */
+/* ================================= */
+
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    (
+      event,
+      session
+    ) => {
+
+      /*
+        setTimeout unngår at vi gjør
+        databasekall direkte inne i
+        Auth-callbacken.
+      */
 
       setTimeout(
-        () => {
+        async () => {
 
-          weightInput.focus();
+          const newUser =
+            session?.user ??
+            null;
 
-          weightInput.select();
+
+          if (
+            newUser?.id ===
+            currentUser?.id
+          ) {
+
+            return;
+
+          }
+
+
+          currentUser =
+            newUser;
+
+
+          if (!currentUser) {
+
+            profile =
+              null;
+
+
+            entries =
+              [];
+
+
+            showAuth();
+
+            return;
+
+          }
+
+
+          showLoading();
+
+
+          await loadUserData();
+
+
+          render();
 
         },
-        50
+        0
       );
 
     }
   );
 
 
-cancelEditBtn
-  .addEventListener(
-    "click",
-    () => {
+/* ================================= */
+/* START APP */
+/* ================================= */
 
-      editingToday =
-        false;
+async function init() {
 
+  showLoading();
 
-      render();
 
-    }
-  );
+  renderDate();
 
 
-/* HISTORY */
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
 
-historyBtn
-  .addEventListener(
-    "click",
-    () => {
 
-      renderHistory();
+  if (error) {
 
+    console.error(
+      error
+    );
 
-      historyModal
-        .classList
-        .remove(
-          "hidden"
-        );
+  }
 
-    }
-  );
 
+  currentUser =
+    data.session?.user ??
+    null;
 
-closeHistoryBtn
-  .addEventListener(
-    "click",
-    () => {
 
-      historyModal
-        .classList
-        .add(
-          "hidden"
-        );
+  if (!currentUser) {
 
-    }
-  );
+    showAuth();
 
+    return;
 
-historyModal
-  .addEventListener(
-    "click",
-    event => {
+  }
 
-      if (
-        event.target ===
-        historyModal
-      ) {
 
-        historyModal
-          .classList
-          .add(
-            "hidden"
-          );
+  await loadUserData();
 
-      }
 
-    }
-  );
+  render();
 
+}
 
-/* INSIGHTS */
 
-insightsBtn
-  .addEventListener(
-    "click",
-    () => {
-
-      renderInsights();
-
-
-      insightsModal
-        .classList
-        .remove(
-          "hidden"
-        );
-
-    }
-  );
-
-
-closeInsightsBtn
-  .addEventListener(
-    "click",
-    () => {
-
-      insightsModal
-        .classList
-        .add(
-          "hidden"
-        );
-
-    }
-  );
-
-
-insightsModal
-  .addEventListener(
-    "click",
-    event => {
-
-      if (
-        event.target ===
-        insightsModal
-      ) {
-
-        insightsModal
-          .classList
-          .add(
-            "hidden"
-          );
-
-      }
-
-    }
-  );
-
-
-/* SETTINGS */
-
-settingsBtn
-  .addEventListener(
-    "click",
-    () => {
-
-      startWeightInput.value =
-        settings.startWeight ??
-        "";
-
-
-      goalWeightInput.value =
-        settings.goalWeight ??
-        "";
-
-
-      settingsModal
-        .classList
-        .remove(
-          "hidden"
-        );
-
-    }
-  );
-
-
-closeSettingsBtn
-  .addEventListener(
-    "click",
-    () => {
-
-      settingsModal
-        .classList
-        .add(
-          "hidden"
-        );
-
-    }
-  );
-
-
-settingsModal
-  .addEventListener(
-    "click",
-    event => {
-
-      if (
-        event.target ===
-        settingsModal
-      ) {
-
-        settingsModal
-          .classList
-          .add(
-            "hidden"
-          );
-
-      }
-
-    }
-  );
-
-
-saveSettingsBtn
-  .addEventListener(
-    "click",
-    () => {
-
-      const start =
-        parseFloat(
-          startWeightInput.value
-        );
-
-
-      const goal =
-        parseFloat(
-          goalWeightInput.value
-        );
-
-
-      settings.startWeight =
-        Number.isFinite(
-          start
-        )
-          ? start
-          : settings.startWeight;
-
-
-      settings.goalWeight =
-        Number.isFinite(
-          goal
-        )
-          ? goal
-          : null;
-
-
-      settingsModal
-        .classList
-        .add(
-          "hidden"
-        );
-
-
-      render();
-
-    }
-  );
-
-
-/* START */
-
-render();
+init();

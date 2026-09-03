@@ -1,7 +1,7 @@
 {
-  "name": "Vekt",
-  "short_name": "Vekt",
-  "description": "Daglig vektregistrering og utvikling",
+  "name": "Eventyr",
+  "short_name": "Eventyr",
+  "description": "Trening, quests, levels og vektutvikling i ett lite eventyr",
   "id": "/Vekt-app/",
   "start_url": "/Vekt-app/",
   "scope": "/Vekt-app/",

@@ -1795,3 +1795,300 @@ input[type="number"] {
   margin: 0;
   transform: translateX(-50%);
 }
+
+
+/* =========================================
+   RPG V1.1 — tighter mobile layout + hero
+   ========================================= */
+
+/* The game is designed as a mobile app. Keep it phone-like on desktop too. */
+.game-shell {
+  width: min(460px, 100%);
+  margin-inline: auto;
+  padding-top: 12px;
+  padding-bottom: 126px;
+}
+
+.game-shell .app-page {
+  width: 100%;
+}
+
+/* Let the artwork be the scene itself instead of a small pasted-in image. */
+.adventure-scene {
+  min-height: 645px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(255, 239, 164, .78), transparent 23%),
+    linear-gradient(180deg, #c9dfc2 0%, #aac5a2 38%, #718f70 72%, #4b684f 100%);
+  box-shadow:
+    0 18px 48px rgba(49, 75, 52, .16),
+    inset 0 1px 0 rgba(255,255,245,.52);
+}
+
+.adventure-scene::before {
+  width: 120%;
+  height: 36%;
+  left: -10%;
+  bottom: -5%;
+  background: linear-gradient(0deg, rgba(35, 58, 40, .72), transparent 92%);
+  filter: none;
+}
+
+.adventure-scene::after {
+  width: 150px;
+  height: 150px;
+  left: 7%;
+  bottom: 12%;
+}
+
+.scene-topbar {
+  padding: 16px 16px 0;
+}
+
+.journey-day,
+.scene-streak {
+  padding: 8px 12px;
+  background: rgba(255, 251, 232, .84);
+  box-shadow: 0 7px 20px rgba(50, 70, 48, .1);
+}
+
+.level-panel {
+  width: calc(100% - 28px);
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  background: rgba(255, 251, 233, .91);
+  box-shadow: 0 10px 28px rgba(52, 71, 49, .12);
+}
+
+.level-copy {
+  min-width: 48px;
+}
+
+.level-copy strong {
+  font-size: 1.85rem;
+}
+
+/* The image already contains the character + camp, so use it edge-to-edge. */
+.hero-stage {
+  position: relative;
+  z-index: 2;
+  height: 438px;
+  margin-top: 8px;
+  display: block;
+  overflow: hidden;
+  background-image: url("./adventurer.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 46%;
+}
+
+.hero-stage::before,
+.hero-stage::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hero-stage::before {
+  top: 0;
+  height: 72px;
+  background: linear-gradient(180deg, rgba(174, 198, 163, .72), transparent);
+}
+
+.hero-stage::after {
+  bottom: 0;
+  height: 115px;
+  background: linear-gradient(0deg, rgba(61, 91, 65, .72), transparent);
+}
+
+.hero-stage .adventurer-character {
+  display: none;
+}
+
+.camp-glow {
+  z-index: 4;
+  left: 10%;
+  bottom: 11%;
+  width: 92px;
+  height: 78px;
+}
+
+.hero-stats {
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 7;
+  border-radius: 20px;
+  background: rgba(255, 251, 232, .92);
+  box-shadow: 0 10px 28px rgba(45, 67, 47, .14);
+}
+
+.hero-stats > div {
+  padding: 10px 6px;
+}
+
+.hero-stats strong {
+  font-size: 1.12rem;
+}
+
+/* Cards should read as separate sections, not one endless cream column. */
+.game-card {
+  margin-top: 14px;
+  box-shadow:
+    0 12px 32px rgba(65, 83, 59, .08),
+    inset 0 1px 0 rgba(255,255,245,.45);
+}
+
+.quest-card-main {
+  margin-top: 16px;
+}
+
+/* Keep the fixed navigation aligned with the actual game width. */
+.game-bottom-nav {
+  width: min(438px, calc(100% - 24px));
+  padding: 6px;
+  border-radius: 22px;
+  box-shadow: 0 12px 34px rgba(56, 76, 52, .18);
+}
+
+.game-bottom-nav .game-nav {
+  min-height: 54px;
+}
+
+/* On larger screens, make the phone layout feel intentional and centered. */
+@media (min-width: 601px) {
+  .game-shell {
+    padding-top: 18px;
+  }
+
+  .adventure-scene {
+    border-radius: 34px;
+  }
+
+  .game-bottom-nav {
+    width: 438px;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-shell {
+    width: 100%;
+    padding-top: 8px;
+  }
+
+  .adventure-scene {
+    min-height: 615px;
+    border-radius: 27px;
+  }
+
+  .hero-stage {
+    height: 412px;
+    background-position: center 45%;
+  }
+
+  .level-panel {
+    width: calc(100% - 24px);
+  }
+
+  .hero-stats {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .game-bottom-nav {
+    width: calc(100% - 20px);
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 370px) {
+  .adventure-scene {
+    min-height: 590px;
+  }
+
+  .hero-stage {
+    height: 392px;
+  }
+
+  .level-panel {
+    gap: 10px;
+    padding: 11px 12px;
+  }
+
+  .level-xp-row {
+    font-size: .62rem;
+  }
+}
+
+
+/* V1.1 hero artwork blend: keep the full portrait visible and dissolve its edges
+   into a matching forest backdrop. */
+.hero-stage {
+  background: transparent;
+}
+
+.hero-stage::before {
+  top: -14px;
+  bottom: -14px;
+  height: auto;
+  background: url("./adventurer.png") center 48% / cover no-repeat;
+  filter: blur(13px) saturate(.92);
+  transform: scale(1.11);
+  opacity: .56;
+}
+
+.hero-stage::after {
+  top: 0;
+  bottom: 0;
+  height: auto;
+  background:
+    linear-gradient(90deg,
+      rgba(92, 126, 89, .42) 0%,
+      transparent 18%,
+      transparent 82%,
+      rgba(91, 123, 88, .42) 100%),
+    linear-gradient(180deg,
+      rgba(175, 199, 164, .62) 0%,
+      transparent 15%,
+      transparent 73%,
+      rgba(57, 86, 61, .76) 100%);
+}
+
+.hero-stage .adventurer-character {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 0;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  border-radius: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 20px rgba(38, 58, 40, .18));
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, #000 0%, #000 91%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, #000 0%, #000 91%, transparent 100%);
+  mask-composite: intersect;
+  transform-origin: center bottom;
+  animation: characterIdleCentered 4.6s ease-in-out infinite;
+}
+
+@keyframes characterIdleCentered {
+  0%, 100% { transform: translateX(-50%) translateY(2px) rotate(-.2deg); }
+  50% { transform: translateX(-50%) translateY(-4px) rotate(.2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage .adventurer-character {
+    transform: translateX(-50%);
+  }
+}

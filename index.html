@@ -9,7 +9,652 @@
   >
 
   <meta
+    name="theme-color"<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
     name="theme-color"
+    content="#b7d8d0"
+  >
+
+    <link
+  rel="apple-touch-icon"
+  href="./apple-touch-icon.png"
+>
+
+  <title>Eventyr</title>
+
+  <link
+    rel="manifest"
+    href="./manifest.json"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
+
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Eventyr"
+  >
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- LOADING -->
+    <section id="loadingView" class="loading-view">
+      <div class="loading-content">
+        <div class="loading-leaf">❧</div>
+        <p>Henter reisen din...</p>
+      </div>
+    </section>
+
+    <!-- LOGIN / OPPRETT KONTO -->
+    <section id="authView" class="auth-view hidden">
+      <div class="auth-content">
+
+        <h1>Velkommen.</h1>
+
+        <p class="auth-intro">
+          Logg inn for å fortsette reisen din.
+        </p>
+
+        <div class="auth-fields">
+
+          <label>
+            E-post
+            <input
+              id="authEmail"
+              type="email"
+              autocomplete="email"
+              placeholder="navn@epost.no"
+            >
+          </label>
+
+          <label>
+            Passord
+            <input
+              id="authPassword"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Minst 6 tegn"
+            >
+          </label>
+
+        </div>
+
+        <button
+          id="loginBtn"
+          class="primary-button auth-primary"
+        >
+          Logg inn
+        </button>
+
+        <button
+          id="signupBtn"
+          class="secondary-button"
+        >
+          Opprett bruker
+        </button>
+
+        <p
+          id="authMessage"
+          class="auth-message"
+        ></p>
+
+      </div>
+    </section>
+
+    <!-- DAGENS INNVEIING -->
+    <section id="weighInView" class="weigh-in-view hidden">
+      <div class="weigh-in-content">
+
+        <p
+          id="todayLabel"
+          class="date-label"
+        >
+          I dag
+        </p>
+
+        <h1 id="weighInTitle">
+          God morgen.
+        </h1>
+
+        <p
+          id="weightQuestion"
+          class="weight-question"
+        >
+          Hva veier du i dag?
+        </p>
+
+        <div class="minimal-weight-input">
+          <input
+            id="weightInput"
+            type="number"
+            step="0.1"
+            inputmode="decimal"
+            placeholder="98,4"
+          >
+          <span>kg</span>
+        </div>
+
+        <button
+          id="saveWeightBtn"
+          class="primary-button"
+        >
+          Registrer
+        </button>
+
+        <button
+          id="cancelEditBtn"
+          class="text-button hidden"
+        >
+          Avbryt
+        </button>
+
+      </div>
+    </section>
+
+    <!-- RPG APP -->
+    <section id="dashboardView" class="dashboard-view game-shell hidden">
+
+      <section id="homePage" class="app-page active" data-page="home">
+        <div class="adventure-scene">
+          <div class="ambient-particles" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="floating-leaves" aria-hidden="true">
+            <i>◆</i><i>❧</i><i>◆</i>
+          </div>
+
+          <div class="scene-topbar">
+            <div class="journey-day">Dag <strong id="dayNumber">01</strong></div>
+            <div class="scene-streak"><span class="flame">🔥</span><strong id="homeStreak">0</strong> dager</div>
+          </div>
+
+          <div class="level-panel">
+            <div class="level-copy">
+              <span>LEVEL</span>
+              <strong id="gameLevel">1</strong>
+            </div>
+            <div class="level-progress-wrap">
+              <div class="level-xp-row">
+                <span id="gameXpText">0 / 300 XP</span>
+                <span>🪙 <strong id="gameGold">0</strong></span>
+              </div>
+              <div class="game-progress"><div id="gameXpFill" class="game-progress-fill"></div></div>
+            </div>
+          </div>
+
+          <div class="hero-stage" role="img" aria-label="Eventyreren din i en skogleir">
+            <div class="camp-glow" aria-hidden="true"></div>
+            <img class="adventurer-character" src="./adventurer.png" alt="Anime-inspirert eventyrer i en skogleir">
+          </div>
+
+          <div class="hero-stats">
+            <div><span>💪</span><small>Styrke</small><strong id="strengthStat">1</strong></div>
+            <div><span>♥</span><small>Utholdenhet</small><strong id="enduranceStat">1</strong></div>
+            <div><span>✦</span><small>Disiplin</small><strong id="disciplineStat">1</strong></div>
+          </div>
+        </div>
+
+        <section class="game-card quest-card-main">
+          <div class="game-card-heading">
+            <div>
+              <span class="section-kicker">DAGENS OPPDRAG</span>
+              <h2>Bygg eventyreren</h2>
+            </div>
+            <span class="daily-reset">Ny dag ved midnatt</span>
+          </div>
+          <div id="dailyQuestList" class="quest-list"></div>
+        </section>
+
+        <section class="game-card camp-card">
+          <div class="camp-icon" aria-hidden="true">🏕️</div>
+          <div class="camp-copy">
+            <span class="section-kicker">LEIREN DIN</span>
+            <h3>Eventyrbelønning</h3>
+            <p>Leiren samler gull mens du er borte. Level og utstyr gjør den bedre.</p>
+            <small><strong id="campRate">12</strong> gull/time · opptil <span id="campCap">8</span> timer</small>
+          </div>
+          <button id="campClaimBtn" class="camp-claim-button" type="button">
+            Hent <strong id="campStored">0</strong> 🪙
+          </button>
+          <p id="campClaimMessage" class="camp-message" aria-live="polite"></p>
+        </section>
+
+        <section class="game-card weekly-preview">
+          <div class="game-card-heading compact">
+            <div>
+              <span class="section-kicker">UKENS EVENTYR</span>
+              <h3>Skogvokterens sti</h3>
+            </div>
+            <span class="reward-chip">+500 XP</span>
+          </div>
+          <div class="weekly-goal-row"><span>💪 Styrkeøkter</span><strong id="weeklyStrengthText">0 / 3</strong></div>
+          <div class="mini-track"><div id="weeklyStrengthFill"></div></div>
+          <div class="weekly-goal-row"><span>👟 Aktive dager</span><strong id="weeklyStepsText">0 / 5</strong></div>
+          <div class="mini-track"><div id="weeklyStepsFill"></div></div>
+          <div class="weekly-goal-row"><span>♥ Kondisjonsøkter</span><strong id="weeklyCardioText">0 / 1</strong></div>
+          <div class="mini-track"><div id="weeklyCardioFill"></div></div>
+        </section>
+      </section>
+
+      <section id="questsPage" class="app-page" data-page="quests">
+        <header class="page-header">
+          <span class="section-kicker">EVENTYRLOGG</span>
+          <h1>Quests</h1>
+          <p>Det du gjør i virkeligheten bygger karakteren din.</p>
+        </header>
+
+        <section class="game-card">
+          <div class="game-card-heading compact">
+            <div><span class="section-kicker">DAGLIGE</span><h2>Dagens quests</h2></div>
+            <span class="reward-chip">XP + stats</span>
+          </div>
+          <div id="questPageDailyList" class="quest-list large"></div>
+        </section>
+
+        <section class="game-card quest-weekly-card">
+          <span class="section-kicker">UKENTLIGE</span>
+          <h2>Skogvokterens sti</h2>
+          <p>Fullfør alle tre målene denne uken for å åpne eventyrkisten.</p>
+          <div class="weekly-quest-grid">
+            <div><span>💪</span><strong id="questWeeklyStrength">0 / 3</strong><small>styrkeøkter</small></div>
+            <div><span>👟</span><strong id="questWeeklySteps">0 / 5</strong><small>aktive dager</small></div>
+            <div><span>♥</span><strong id="questWeeklyCardio">0 / 1</strong><small>kondisjon</small></div>
+          </div>
+          <div class="treasure-row">
+            <div class="treasure">🧰</div>
+            <div><strong>Ukeskiste</strong><small id="weeklyChestStatus">3 mål gjenstår</small></div>
+            <span>+500 XP</span>
+          </div>
+        </section>
+
+        <section class="game-card achievements-preview">
+          <span class="section-kicker">ACHIEVEMENTS</span>
+          <h2>På reisen</h2>
+          <div id="achievementList" class="achievement-list"></div>
+        </section>
+      </section>
+
+      <section id="adventurerPage" class="app-page" data-page="adventurer">
+        <header class="page-header">
+          <span class="section-kicker">DIN KARAKTER</span>
+          <h1>Eventyrer</h1>
+          <p>Oppgrader gear for å få mer ut av quests og leiren.</p>
+        </header>
+
+        <section class="adventurer-profile game-card">
+          <div class="adventurer-portrait-wrap">
+            <div class="portrait-rays" aria-hidden="true"></div>
+            <img src="./adventurer.png" alt="Eventyreren din" class="adventurer-portrait">
+            <div class="portrait-level">Lv. <strong id="adventureLevel">1</strong></div>
+          </div>
+          <div class="profile-xp">
+            <div><span>XP</span><strong id="adventureXp">0 / 300</strong></div>
+            <div class="game-progress"><div id="adventureXpFill" class="game-progress-fill"></div></div>
+          </div>
+          <div class="profile-currency">🪙 <strong id="adventureGold">0</strong> gull</div>
+        </section>
+
+        <section class="stat-skill-grid">
+          <div class="skill-card"><span>💪</span><small>Styrke</small><strong id="adventureStrength">1</strong><div class="skill-bar"><i id="strengthSkillFill"></i></div></div>
+          <div class="skill-card"><span>♥</span><small>Utholdenhet</small><strong id="adventureEndurance">1</strong><div class="skill-bar"><i id="enduranceSkillFill"></i></div></div>
+          <div class="skill-card"><span>✦</span><small>Disiplin</small><strong id="adventureDiscipline">1</strong><div class="skill-bar"><i id="disciplineSkillFill"></i></div></div>
+        </section>
+
+        <section class="game-card">
+          <div class="game-card-heading compact">
+            <div><span class="section-kicker">UTSTYR</span><h2>Gear</h2></div>
+            <span class="reward-chip">Oppgrader med gull</span>
+          </div>
+          <div id="gearGrid" class="gear-grid"></div>
+        </section>
+      </section>
+
+      <section id="progressPage" class="app-page" data-page="progress">
+        <header class="page-header progress-header">
+          <div>
+            <span class="section-kicker">FREMGANG</span>
+            <h1>Reisen din</h1>
+          </div>
+          <button id="editWeightBtn" class="edit-button" type="button">Registrer / endre</button>
+        </header>
+
+        <section class="game-card progress-weight-card">
+          <div class="current-weight compact-weight">
+            <span id="currentWeight">--</span><small>kg</small>
+          </div>
+          <p id="heroChange" class="hero-change">Første innveiing</p>
+
+          <div class="quick-stats">
+            <div class="quick-stat"><span>7-dagers snitt</span><strong id="averageWeight">--</strong></div>
+            <div class="stat-divider"></div>
+            <div class="quick-stat"><span>Laveste</span><strong id="lowestWeight">--</strong></div>
+            <div class="stat-divider"></div>
+            <div class="quick-stat"><span>Streak</span><strong class="streak-row"><span class="flame">🔥</span><span id="streakStat">--</span></strong></div>
+          </div>
+        </section>
+
+        <section class="goal-section game-card progress-goal-card">
+          <div class="section-kicker">VEKTMÅL</div>
+          <div class="goal-heading"><h2 id="goalHeadline">Sett et mål</h2><strong id="progressPercent">--</strong></div>
+          <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+          <div class="goal-numbers"><span id="startWeightText">Start --</span><span id="remaining">--</span><span id="goalWeightText">Mål --</span></div>
+        </section>
+
+        <section class="chart-section game-card">
+          <div class="chart-heading"><div><div class="section-kicker">UTVIKLING</div><h2>Vektutvikling</h2></div></div>
+          <div class="chart-container"><canvas id="weightChart"></canvas></div>
+        </section>
+
+        <div class="progress-actions">
+          <button id="historyBtn" class="game-secondary-button" type="button">↗ Historikk</button>
+          <button id="insightsBtn" class="game-secondary-button" type="button">✦ Insights</button>
+        </div>
+      </section>
+
+      <section id="settingsPage" class="app-page" data-page="settings">
+        <header class="page-header">
+          <span class="section-kicker">TILPASS REISEN</span>
+          <h1>Innstillinger</h1>
+          <p>Vektmål, varsler og kontoinnstillinger ligger samlet her.</p>
+        </header>
+
+        <section class="game-card settings-menu-card">
+          <button id="settingsBtn" class="settings-menu-row" type="button"><span>🎯</span><div><strong>Mål og vekt</strong><small>Startvekt, målvekt og fremgang</small></div><b>›</b></button>
+          <button id="notificationShortcutBtn" class="settings-menu-row" type="button"><span>🔔</span><div><strong>Påminnelser</strong><small>Daglig varsel og testvarsel</small></div><b>›</b></button>
+          <div class="settings-menu-row static"><span>🎮</span><div><strong>RPG-progresjon</strong><small>Lagres foreløpig på denne enheten i første versjon</small></div><b>V1</b></div>
+        </section>
+
+        <section class="game-card version-card">
+          <span class="section-kicker">FØRSTE RPG-VERSJON</span>
+          <h2>Eventyret har begynt</h2>
+          <p>Quest-system, levels, stats, gear og passiv leirbelønning er aktive. Neste steg er synk av RPG-data og flere karakterstadier.</p>
+        </section>
+      </section>
+
+      <div id="gameToast" class="game-toast" role="status" aria-live="polite"></div>
+
+      <nav class="bottom-nav game-bottom-nav" aria-label="Hovedmeny">
+        <button class="game-nav active" data-target="home" type="button"><span class="nav-icon">⌂</span><span>Hjem</span></button>
+        <button class="game-nav" data-target="quests" type="button"><span class="nav-icon">⚑</span><span>Quests</span></button>
+        <button class="game-nav" data-target="adventurer" type="button"><span class="nav-icon">♙</span><span>Eventyrer</span></button>
+        <button class="game-nav" data-target="progress" type="button"><span class="nav-icon">↗</span><span>Fremgang</span></button>
+        <button id="settingsNavBtn" class="game-nav" data-target="settings" type="button"><span class="nav-icon">⚙</span><span>Mer</span></button>
+      </nav>
+
+    </section>
+  </main>
+
+  <!-- HISTORIKK -->
+  <div id="historyModal" class="modal hidden">
+    <div class="modal-card">
+
+      <div class="modal-heading">
+        <div>
+          <span class="section-kicker">
+            INNVEIINGER
+          </span>
+
+          <h2>
+            Historikk
+          </h2>
+        </div>
+
+        <button
+          id="closeHistoryBtn"
+          class="close-button"
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+        id="historyList"
+        class="history-list"
+      ></div>
+
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div id="insightsModal" class="modal hidden">
+    <div class="modal-card">
+
+      <div class="modal-heading">
+        <div>
+          <span class="section-kicker">
+            DIN UTVIKLING
+          </span>
+
+          <h2>
+            Insights
+          </h2>
+        </div>
+
+        <button
+          id="closeInsightsBtn"
+          class="close-button"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="insight-feature">
+        <span>
+          Gjennomsnittlig tempo
+        </span>
+
+        <strong id="insightPace">
+          --
+        </strong>
+
+        <small>
+          per uke
+        </small>
+      </div>
+
+      <div class="insight-grid">
+
+        <div>
+          <span>Siste 7 dager</span>
+          <strong id="insight7Days">--</strong>
+        </div>
+
+        <div>
+          <span>Siste 30 dager</span>
+          <strong id="insight30Days">--</strong>
+        </div>
+
+        <div>
+          <span>Laveste vekt</span>
+          <strong id="insightLowest">--</strong>
+        </div>
+
+        <div>
+          <span>Lengste streak</span>
+          <strong id="insightLongestStreak">--</strong>
+        </div>
+
+        <div>
+          <span>Totalt gått ned</span>
+          <strong id="insightLost">--</strong>
+        </div>
+
+        <div>
+          <span>Mot målet</span>
+          <strong id="insightProgress">--</strong>
+        </div>
+
+      </div>
+
+      <div class="prediction">
+        <span class="section-kicker">
+          PROGNOSE
+        </span>
+
+        <p id="goalPrediction">
+          Flere innveiinger kreves før vi kan lage en prognose.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INNSTILLINGER -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-card">
+
+      <div class="modal-heading">
+        <div>
+          <span class="section-kicker">
+            DINE MÅL
+          </span>
+
+          <h2>
+            Innstillinger
+          </h2>
+        </div>
+
+        <button
+          id="closeSettingsBtn"
+          class="close-button"
+        >
+          ×
+        </button>
+      </div>
+
+      <label>
+        Startvekt
+
+        <div class="settings-input">
+          <input
+            id="startWeightInput"
+            type="number"
+            step="0.1"
+          >
+          <span>kg</span>
+        </div>
+      </label>
+
+      <label>
+        Målvekt
+
+        <div class="settings-input">
+          <input
+            id="goalWeightInput"
+            type="number"
+            step="0.1"
+          >
+          <span>kg</span>
+        </div>
+      </label>
+
+      <button
+        id="saveSettingsBtn"
+        class="primary-button modal-save"
+      >
+        Lagre
+      </button>
+
+      <!-- VARSLER -->
+      <div class="notification-section">
+
+        <span class="section-kicker">
+          VARSLER
+        </span>
+
+        <div class="notification-row">
+
+          <div>
+            <strong>
+              Daglig påminnelse
+            </strong>
+
+            <small>
+              Påminn meg om dagens innveiing
+            </small>
+          </div>
+
+          <button
+            id="notificationToggleBtn"
+            class="notification-toggle"
+          >
+            Aktiver
+          </button>
+
+        </div>
+
+        <button
+          id="testNotificationBtn"
+          class="secondary-button notification-test"
+          disabled
+        >
+          Send testvarsel
+        </button>
+
+        <p
+          id="notificationMessage"
+          class="notification-message"
+        ></p>
+
+      </div>
+
+      <!-- KONTO -->
+      <div class="account-section">
+
+        <span class="section-kicker">
+          KONTO
+        </span>
+
+        <p
+          id="accountEmail"
+          class="account-email"
+        >
+          --
+        </p>
+
+        <button
+          id="logoutBtn"
+          class="logout-button"
+        >
+          Logg ut
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
+
     content="#b7d8d0"
   >
 

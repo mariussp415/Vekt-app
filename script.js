@@ -245,14 +245,6 @@ let weightChart = null;
 
 let editingToday = false;
 
-let weighInFromApp = false;
-
-let activePage = "home";
-
-let gameState = null;
-
-let gameToastTimer = null;
-
 let lastKnownDate = getToday();
 
 /* ================================= */
@@ -553,8 +545,6 @@ async function logout() {
   };
 
   editingToday = false;
-  weighInFromApp = false;
-  gameState = null;
 
   closeAllModals();
 
@@ -669,8 +659,6 @@ async function loadUserData() {
           profile.goal_weight
         )
       : null;
-
-  loadGameState();
 }
 
 /* ================================= */
@@ -718,30 +706,72 @@ function renderView() {
     return;
   }
 
-  const todayEntry = getTodayEntry();
+  const todayEntry =
+    getTodayEntry();
 
-  if (editingToday || weighInFromApp) {
+  if (
+    !todayEntry ||
+    editingToday
+  ) {
     hideMainViews();
-    weighInView.classList.remove("hidden");
 
-    if (todayEntry) {
-      weighInTitle.textContent = "Endre vekten.";
-      weightQuestion.textContent = "Oppdater dagens innveiing.";
-      weightInput.value = todayEntry.weight;
-      saveWeightBtn.textContent = "Lagre endring";
+    weighInView
+      .classList
+      .remove(
+        "hidden"
+      );
+
+    if (
+      todayEntry &&
+      editingToday
+    ) {
+      weighInTitle.textContent =
+        "Endre vekten.";
+
+      weightQuestion.textContent =
+        "Oppdater dagens innveiing.";
+
+      weightInput.value =
+        todayEntry.weight;
+
+      saveWeightBtn.textContent =
+        "Lagre endring";
+
+      cancelEditBtn
+        .classList
+        .remove(
+          "hidden"
+        );
     } else {
-      weighInTitle.textContent = "Registrer vekten.";
-      weightQuestion.textContent = "Hva veier du i dag?";
-      weightInput.value = "";
-      saveWeightBtn.textContent = "Registrer";
+      weighInTitle.textContent =
+        "God morgen.";
+
+      weightQuestion.textContent =
+        "Hva veier du i dag?";
+
+      weightInput.value =
+        "";
+
+      saveWeightBtn.textContent =
+        "Registrer";
+
+      cancelEditBtn
+        .classList
+        .add(
+          "hidden"
+        );
     }
 
-    cancelEditBtn.classList.remove("hidden");
     return;
   }
 
   hideMainViews();
-  dashboardView.classList.remove("hidden");
+
+  dashboardView
+    .classList
+    .remove(
+      "hidden"
+    );
 }
 
 /* ================================= */
@@ -914,8 +944,6 @@ async function saveWeight() {
 
   editingToday =
     false;
-
-  weighInFromApp = false;
 
   await loadUserData();
 
@@ -1968,563 +1996,6 @@ async function saveSettings() {
   render();
 }
 
-/* =========================================================
-   RPG V1 — local progression
-========================================================= */
-
-const QUESTS = [
-  {
-    id: "weight",
-    icon: "⚖️",
-    label: "Registrer vekten din",
-    subtitle: "Hold oversikt over reisen",
-    xp: 20,
-    stat: "discipline",
-    statGain: 2
-  },
-  {
-    id: "strength",
-    icon: "🏋️",
-    label: "Styrketrening",
-    subtitle: "En gjennomført styrkeøkt",
-    xp: 100,
-    stat: "strength",
-    statGain: 8
-  },
-  {
-    id: "cardio",
-    icon: "♥",
-    label: "Kondisjon",
-    subtitle: "Løp, sykkel, tennis, padel eller lignende",
-    xp: 80,
-    stat: "endurance",
-    statGain: 8
-  },
-  {
-    id: "steps",
-    icon: "👟",
-    label: "10 000 skritt",
-    subtitle: "En aktiv dag ute i verden",
-    xp: 50,
-    stat: "endurance",
-    statGain: 4
-  },
-  {
-    id: "water",
-    icon: "💧",
-    label: "Drikk 2 L vann",
-    subtitle: "Hold eventyreren hydrert",
-    xp: 30,
-    stat: "discipline",
-    statGain: 3
-  }
-];
-
-const GEAR = [
-  {
-    id: "sword",
-    icon: "⚔️",
-    name: "Skogvokterens sverd",
-    effect: level => `+${level * 4} gull/time fra leiren`
-  },
-  {
-    id: "boots",
-    icon: "🥾",
-    name: "Vandrerstøvler",
-    effect: level => `+${level * 3}% XP fra quests`
-  },
-  {
-    id: "backpack",
-    icon: "🎒",
-    name: "Eventyrsekk",
-    effect: level => `+${level * 2} timer offline-lagring`
-  },
-  {
-    id: "charm",
-    icon: "🧿",
-    name: "Skogamulet",
-    effect: level => `+${level * 5}% XP fra alle quests`
-  }
-];
-
-function gameStorageKey() {
-  return currentUser
-    ? `vekt-rpg-v1:${currentUser.id}`
-    : "vekt-rpg-v1:guest";
-}
-
-function createDefaultGameState() {
-  return {
-    version: 1,
-    totalXp: 0,
-    gold: 150,
-    stats: {
-      strength: 1,
-      endurance: 1,
-      discipline: 1
-    },
-    questHistory: {},
-    weeklyRewards: {},
-    gear: {
-      sword: 0,
-      boots: 0,
-      backpack: 0,
-      charm: 0
-    },
-    campLastClaim: Date.now()
-  };
-}
-
-function loadGameState() {
-  if (!currentUser) {
-    gameState = null;
-    return;
-  }
-
-  try {
-    const stored = localStorage.getItem(gameStorageKey());
-    const parsed = stored ? JSON.parse(stored) : null;
-    const base = createDefaultGameState();
-
-    gameState = {
-      ...base,
-      ...(parsed || {}),
-      stats: {
-        ...base.stats,
-        ...(parsed?.stats || {})
-      },
-      questHistory: parsed?.questHistory || {},
-      weeklyRewards: parsed?.weeklyRewards || {},
-      gear: {
-        ...base.gear,
-        ...(parsed?.gear || {})
-      },
-      campLastClaim: Number(parsed?.campLastClaim) || Date.now()
-    };
-  } catch (error) {
-    console.warn("Kunne ikke lese RPG-data:", error);
-    gameState = createDefaultGameState();
-  }
-}
-
-function saveGameState() {
-  if (!currentUser || !gameState) {
-    return;
-  }
-
-  localStorage.setItem(
-    gameStorageKey(),
-    JSON.stringify(gameState)
-  );
-}
-
-function getLevelInfo(totalXp = 0) {
-  let level = 1;
-  let remaining = Math.max(0, Math.floor(totalXp));
-  let required = 300;
-
-  while (remaining >= required && level < 100) {
-    remaining -= required;
-    level++;
-    required = 250 + level * 50;
-  }
-
-  return {
-    level,
-    currentXp: remaining,
-    required,
-    percent: Math.min(100, (remaining / required) * 100)
-  };
-}
-
-function getQuestXpMultiplier() {
-  if (!gameState) return 1;
-  return 1 +
-    (gameState.gear.boots || 0) * 0.03 +
-    (gameState.gear.charm || 0) * 0.05;
-}
-
-function getCampRate() {
-  if (!gameState) return 12;
-  const level = getLevelInfo(gameState.totalXp).level;
-  return 12 + Math.floor(level / 2) + (gameState.gear.sword || 0) * 4;
-}
-
-function getCampCapHours() {
-  if (!gameState) return 8;
-  return 8 + (gameState.gear.backpack || 0) * 2;
-}
-
-function getCampStored() {
-  if (!gameState) return 0;
-  const elapsedHours = Math.max(
-    0,
-    (Date.now() - gameState.campLastClaim) / 3600000
-  );
-  const cappedHours = Math.min(elapsedHours, getCampCapHours());
-  return Math.floor(cappedHours * getCampRate());
-}
-
-function ensureTodayQuestState() {
-  if (!gameState) return null;
-  const today = getToday();
-  if (!gameState.questHistory[today]) {
-    gameState.questHistory[today] = {};
-  }
-  return gameState.questHistory[today];
-}
-
-function awardXp(baseXp) {
-  const amount = Math.max(1, Math.round(baseXp * getQuestXpMultiplier()));
-  const before = getLevelInfo(gameState.totalXp).level;
-  gameState.totalXp += amount;
-  const after = getLevelInfo(gameState.totalXp).level;
-
-  if (after > before) {
-    showGameToast(`Level up! Du er nå Level ${after} ✦`);
-  }
-
-  return amount;
-}
-
-function syncWeightQuest() {
-  if (!gameState || !getTodayEntry()) return;
-  const todayState = ensureTodayQuestState();
-  if (todayState.weight) return;
-
-  const quest = QUESTS.find(item => item.id === "weight");
-  todayState.weight = true;
-  const awarded = awardXp(quest.xp);
-  gameState.stats.discipline += quest.statGain;
-  gameState.gold += 2;
-  saveGameState();
-  showGameToast(`Innveiing fullført · +${awarded} XP`);
-}
-
-function completeQuest(id) {
-  if (!gameState) return;
-
-  if (id === "weight" && !getTodayEntry()) {
-    openWeightEntry();
-    return;
-  }
-
-  const quest = QUESTS.find(item => item.id === id);
-  const todayState = ensureTodayQuestState();
-
-  if (!quest || todayState[id]) {
-    return;
-  }
-
-  todayState[id] = true;
-  const awarded = awardXp(quest.xp);
-  gameState.stats[quest.stat] += quest.statGain;
-  gameState.gold += Math.max(2, Math.round(quest.xp / 12));
-  saveGameState();
-  checkWeeklyReward();
-  renderGame();
-  showGameToast(`${quest.label} · +${awarded} XP`);
-}
-
-function getWeekStart(dateString = getToday()) {
-  const date = parseDate(dateString);
-  const day = date.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  date.setDate(date.getDate() + diff);
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0")
-  ].join("-");
-}
-
-function getWeeklyProgress() {
-  if (!gameState) {
-    return { strength: 0, steps: 0, cardio: 0 };
-  }
-
-  const weekStart = getWeekStart();
-  const progress = { strength: 0, steps: 0, cardio: 0 };
-
-  Object.entries(gameState.questHistory).forEach(([date, quests]) => {
-    const diff = daysBetween(weekStart, date);
-    if (diff < 0 || diff > 6) return;
-    if (quests.strength) progress.strength++;
-    if (quests.steps) progress.steps++;
-    if (quests.cardio) progress.cardio++;
-  });
-
-  return progress;
-}
-
-function checkWeeklyReward() {
-  if (!gameState) return;
-  const progress = getWeeklyProgress();
-  const key = getWeekStart();
-  const complete =
-    progress.strength >= 3 &&
-    progress.steps >= 5 &&
-    progress.cardio >= 1;
-
-  if (complete && !gameState.weeklyRewards[key]) {
-    gameState.weeklyRewards[key] = true;
-    gameState.totalXp += 500;
-    gameState.gold += 150;
-    saveGameState();
-    showGameToast("Ukeskisten åpnet! +500 XP · +150 gull 🧰");
-  }
-}
-
-function countCompletedQuests() {
-  if (!gameState) return 0;
-  return Object.values(gameState.questHistory)
-    .reduce(
-      (sum, day) => sum + Object.values(day).filter(Boolean).length,
-      0
-    );
-}
-
-function renderQuestRows(target) {
-  if (!target || !gameState) return;
-  const todayState = ensureTodayQuestState();
-
-  target.innerHTML = QUESTS.map(quest => {
-    const done = !!todayState[quest.id];
-    const actualXp = Math.round(quest.xp * getQuestXpMultiplier());
-
-    return `
-      <button class="quest-row ${done ? "done" : ""}" data-quest-id="${quest.id}" type="button" ${done ? "disabled" : ""}>
-        <span class="quest-icon">${quest.icon}</span>
-        <span class="quest-copy">
-          <strong>${quest.label}</strong>
-          <small>${quest.subtitle}</small>
-        </span>
-        <span class="quest-reward">
-          +${actualXp} XP
-          <span class="quest-check">✓</span>
-        </span>
-      </button>
-    `;
-  }).join("");
-}
-
-function renderAchievements() {
-  const target = document.getElementById("achievementList");
-  if (!target || !gameState) return;
-
-  const level = getLevelInfo(gameState.totalXp).level;
-  const completed = countCompletedQuests();
-  const streak = calculateCurrentStreak();
-  const stats = calculateStats();
-  const hitGoal = stats?.goal !== null && stats?.latest?.weight <= stats.goal;
-
-  const achievements = [
-    { icon: "🌱", title: "Første steg", text: "Fullfør ditt første quest", unlocked: completed >= 1 },
-    { icon: "🔥", title: "Dedikert", text: "7 dagers innveiingsstreak", unlocked: streak >= 7 },
-    { icon: "🛡️", title: "Eventyrer", text: "Nå Level 5", unlocked: level >= 5 },
-    { icon: "🏆", title: "Målmester", text: "Nå vektmålet ditt", unlocked: !!hitGoal }
-  ];
-
-  target.innerHTML = achievements.map(item => `
-    <div class="achievement ${item.unlocked ? "" : "locked"}">
-      <span class="achievement-icon">${item.icon}</span>
-      <div><strong>${item.title}</strong><small>${item.text}</small></div>
-      <b>${item.unlocked ? "✓" : "🔒"}</b>
-    </div>
-  `).join("");
-}
-
-function getGearUpgradeCost(level) {
-  return Math.round(120 * Math.pow(1.75, level));
-}
-
-function renderGear() {
-  const target = document.getElementById("gearGrid");
-  if (!target || !gameState) return;
-
-  target.innerHTML = GEAR.map(item => {
-    const level = gameState.gear[item.id] || 0;
-    const cost = getGearUpgradeCost(level);
-    const canBuy = gameState.gold >= cost;
-    const currentEffect = level > 0 ? item.effect(level) : "Ikke aktiv ennå";
-    const nextEffect = item.effect(level + 1);
-
-    return `
-      <div class="gear-item">
-        <div class="gear-head">
-          <span>${item.icon}</span>
-          <div><strong>${item.name}</strong><small>Level ${level}</small></div>
-        </div>
-        <div class="gear-effect">${currentEffect}<br><strong>Neste:</strong> ${nextEffect}</div>
-        <button class="gear-upgrade" data-gear-id="${item.id}" type="button" ${canBuy ? "" : "disabled"}>
-          Oppgrader · ${cost} 🪙
-        </button>
-      </div>
-    `;
-  }).join("");
-}
-
-function upgradeGear(id) {
-  if (!gameState) return;
-  const item = GEAR.find(gear => gear.id === id);
-  if (!item) return;
-
-  const level = gameState.gear[id] || 0;
-  const cost = getGearUpgradeCost(level);
-  if (gameState.gold < cost) {
-    showGameToast("Du trenger mer gull til denne oppgraderingen.");
-    return;
-  }
-
-  gameState.gold -= cost;
-  gameState.gear[id] = level + 1;
-  saveGameState();
-  renderGame();
-  showGameToast(`${item.name} er nå Level ${level + 1} ✦`);
-}
-
-function claimCampReward() {
-  if (!gameState) return;
-  const stored = getCampStored();
-  if (stored < 1) {
-    showGameToast("Leiren trenger litt tid til å samle mer gull.");
-    return;
-  }
-
-  gameState.gold += stored;
-  gameState.campLastClaim = Date.now();
-  saveGameState();
-  renderGame();
-  showGameToast(`Leiren ga deg ${stored} gull 🪙`);
-}
-
-function setWidth(id, value, max) {
-  const element = document.getElementById(id);
-  if (!element) return;
-  const pct = max > 0 ? Math.min(100, Math.max(0, value / max * 100)) : 0;
-  element.style.width = `${pct}%`;
-}
-
-function renderGame() {
-  if (!gameState || !currentUser) return;
-
-  syncWeightQuest();
-  checkWeeklyReward();
-
-  const levelInfo = getLevelInfo(gameState.totalXp);
-  const weekly = getWeeklyProgress();
-  const streak = calculateCurrentStreak();
-  const campStored = getCampStored();
-
-  const setText = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  };
-
-  setText("gameLevel", levelInfo.level);
-  setText("gameXpText", `${levelInfo.currentXp} / ${levelInfo.required} XP`);
-  setText("gameGold", gameState.gold);
-  setText("homeStreak", streak);
-  setText("strengthStat", gameState.stats.strength);
-  setText("enduranceStat", gameState.stats.endurance);
-  setText("disciplineStat", gameState.stats.discipline);
-  setText("adventureLevel", levelInfo.level);
-  setText("adventureXp", `${levelInfo.currentXp} / ${levelInfo.required}`);
-  setText("adventureGold", gameState.gold);
-  setText("adventureStrength", gameState.stats.strength);
-  setText("adventureEndurance", gameState.stats.endurance);
-  setText("adventureDiscipline", gameState.stats.discipline);
-  setText("campRate", getCampRate());
-  setText("campCap", getCampCapHours());
-  setText("campStored", campStored);
-
-  setWidth("gameXpFill", levelInfo.currentXp, levelInfo.required);
-  setWidth("adventureXpFill", levelInfo.currentXp, levelInfo.required);
-  setWidth("strengthSkillFill", gameState.stats.strength % 10 || 10, 10);
-  setWidth("enduranceSkillFill", gameState.stats.endurance % 10 || 10, 10);
-  setWidth("disciplineSkillFill", gameState.stats.discipline % 10 || 10, 10);
-
-  setText("weeklyStrengthText", `${weekly.strength} / 3`);
-  setText("weeklyStepsText", `${weekly.steps} / 5`);
-  setText("weeklyCardioText", `${weekly.cardio} / 1`);
-  setText("questWeeklyStrength", `${weekly.strength} / 3`);
-  setText("questWeeklySteps", `${weekly.steps} / 5`);
-  setText("questWeeklyCardio", `${weekly.cardio} / 1`);
-  setWidth("weeklyStrengthFill", weekly.strength, 3);
-  setWidth("weeklyStepsFill", weekly.steps, 5);
-  setWidth("weeklyCardioFill", weekly.cardio, 1);
-
-  const goalsDone = [weekly.strength >= 3, weekly.steps >= 5, weekly.cardio >= 1].filter(Boolean).length;
-  setText("weeklyChestStatus", goalsDone === 3 ? "Åpnet denne uken ✓" : `${3 - goalsDone} mål gjenstår`);
-
-  const campButton = document.getElementById("campClaimBtn");
-  if (campButton) campButton.disabled = campStored < 1;
-
-  renderQuestRows(document.getElementById("dailyQuestList"));
-  renderQuestRows(document.getElementById("questPageDailyList"));
-  renderGear();
-  renderAchievements();
-}
-
-function showGameToast(message) {
-  const toast = document.getElementById("gameToast");
-  if (!toast) return;
-  clearTimeout(gameToastTimer);
-  toast.textContent = message;
-  toast.classList.add("show");
-  gameToastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
-}
-
-function openWeightEntry() {
-  weighInFromApp = true;
-  editingToday = !!getTodayEntry();
-  render();
-  setTimeout(() => {
-    weightInput?.focus();
-    weightInput?.select();
-  }, 50);
-}
-
-function setActivePage(page) {
-  activePage = page;
-  document.querySelectorAll(".app-page").forEach(section => {
-    section.classList.toggle("active", section.dataset.page === page);
-  });
-  document.querySelectorAll(".game-nav").forEach(button => {
-    button.classList.toggle("active", button.dataset.target === page);
-  });
-
-  if (page === "progress") {
-    requestAnimationFrame(() => requestAnimationFrame(renderChart));
-  }
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function bindGameEvents() {
-  document.querySelectorAll(".game-nav").forEach(button => {
-    button.addEventListener("click", () => setActivePage(button.dataset.target));
-  });
-
-  document.addEventListener("click", event => {
-    const questButton = event.target.closest("[data-quest-id]");
-    if (questButton) {
-      completeQuest(questButton.dataset.questId);
-      return;
-    }
-
-    const gearButton = event.target.closest("[data-gear-id]");
-    if (gearButton) {
-      upgradeGear(gearButton.dataset.gearId);
-    }
-  });
-
-  document.getElementById("campClaimBtn")?.addEventListener("click", claimCampReward);
-  document.getElementById("notificationShortcutBtn")?.addEventListener("click", () => settingsBtn?.click());
-}
-
-bindGameEvents();
-
 /* ================================= */
 /* RENDER */
 /* ================================= */
@@ -2548,15 +2019,16 @@ function render() {
 
   renderInsights();
 
-  renderGame();
-
-  setActivePage(activePage);
-
   if (
-    !dashboardView.classList.contains("hidden") &&
-    activePage === "progress"
+    !dashboardView
+      .classList
+      .contains(
+        "hidden"
+      )
   ) {
-    requestAnimationFrame(renderChart);
+    requestAnimationFrame(
+      renderChart
+    );
   }
 }
 
@@ -2650,14 +2122,28 @@ weightInput.addEventListener(
 
 editWeightBtn.addEventListener(
   "click",
-  openWeightEntry
+  () => {
+    editingToday =
+      true;
+
+    render();
+
+    setTimeout(
+      () => {
+        weightInput.focus();
+        weightInput.select();
+      },
+      50
+    );
+  }
 );
 
 cancelEditBtn.addEventListener(
   "click",
   () => {
-    editingToday = false;
-    weighInFromApp = false;
+    editingToday =
+      false;
+
     render();
   }
 );
